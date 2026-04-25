@@ -11,6 +11,99 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="assets/favicon.png">
+    <!-- XLSX LIB -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        .lab-container {
+            display: flex;
+            gap: 24px;
+            margin-top: 3rem;
+            text-align: left;
+            align-items: flex-start;
+        }
+        @media (max-width: 768px) {
+            .lab-container { flex-direction: column; }
+        }
+        .lab-sidebar {
+            width: 320px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 24px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        @media (max-width: 768px) {
+            .lab-sidebar { width: 100%; }
+        }
+        .lab-sidebar h3 { margin-top: 0; font-size: 1.2rem; color: var(--text-primary); margin-bottom: 1rem; }
+        .lab-sidebar label { display: block; margin-top: 16px; font-size: 0.9rem; color: var(--text-secondary); }
+        .lab-sidebar select,
+        .lab-sidebar input {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            outline: none;
+        }
+        .lab-sidebar select option { background: var(--bg-color); }
+        .lab-sidebar button {
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lab-sidebar button:hover { background: var(--secondary); transform: translateY(-2px); }
+        .lab-main {
+            flex: 1;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            width: 100%;
+        }
+        .lab-main h3 { margin-top: 0; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .lab-main p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem; }
+        .table-wrapper {
+            width: 100%;
+            max-height: 400px;
+            overflow: auto;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2);
+        }
+        .table-wrapper table {
+            width: max-content;
+            min-width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .table-wrapper th,
+        .table-wrapper td {
+            padding: 12px;
+            border: 1px solid var(--glass-border);
+            text-align: left;
+        }
+        .table-wrapper th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(5px);
+        }
+    </style>
 </head>
 <body>
     <header id="header">
@@ -47,22 +140,6 @@
             <p class="reveal-up" style="transition-delay: 0.1s;">Onde ideias se transformam em protótipos de dados inovadores.</p>
         </div>
     </section>
-
-    <section class="page-content">
-        <div class="container text-content reveal-up">
-            <h2>Testando o Futuro</h2>
-            <p>A área de laboratório é o nosso espaço de inovação aberta. Aqui, compartilhamos experimentos, protótipos de novas integrações e estudos de caso focados em tecnologias emergentes como Inteligência Artificial aliada a Dados e Analytics Preditivo.</p>
-            
-            <div class="glass-card" style="text-align: center; margin-top: 3rem;">
-                <i class="fas fa-flask" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                <h3>Em Breve...</h3>
-                <p>Estamos preparando novidades e experimentos incríveis para compartilhar com você. Volte em breve!</p>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container footer-content">
             <div class="footer-brand">
                 <a href="/" class="logo">Datta<span>Conect</span></a>
                 <p>Transformando dados complexos em decisões simples, rápidas e seguras para a sua empresa.</p>
@@ -87,6 +164,168 @@
         </div>
     </footer>
 
+    <script>
+        let dadosGlobais = [];
+
+        /* GERAÇÃO */
+        function gerar() {
+            const categoriaEl = document.getElementById("categoria");
+            const linhasEl = document.getElementById("linhas");
+            const colunasEl = document.getElementById("colunas");
+            const tabela = document.getElementById("tabela");
+
+            const categoria = categoriaEl.value;
+            const linhas = +linhasEl.value;
+            const colunas = +colunasEl.value;
+
+            dadosGlobais = [];
+
+            for (let i = 0; i < linhas; i++) {
+                let base = {};
+
+                if (categoria === "Empresarial") {
+                    base = {
+                        Empresa: "Empresa " + (i + 1),
+                        Setor: ["Tecnologia", "Varejo", "Saúde"][rand(3)],
+                        Funcionários: rand(900) + 10,
+                        Faturamento: moeda(5000000),
+                        Risco: ["Baixo", "Médio", "Alto"][rand(3)],
+                        Fundação: data()
+                    };
+                }
+
+                if (categoria === "Financeiro") {
+                    base = {
+                        Data: data(),
+                        Tipo: ["Crédito", "Débito"][rand(2)],
+                        Valor: moeda(10000),
+                        Categoria: ["Alimentação", "Moradia", "Lazer"][rand(3)],
+                        Status: ["Pago", "Pendente", "Cancelado"][rand(3)]
+                    };
+                }
+
+                if (categoria === "Instagram") {
+                    base = {
+                        Perfil: "@perfil_" + i,
+                        Seguidores: rand(500000),
+                        Engajamento: randFloat(15) + "%",
+                        Posts: rand(3000),
+                        Alcance: rand(1000000)
+                    };
+                }
+
+                if (categoria === "E-commerce") {
+                    base = {
+                        Produto: "Produto " + (i + 1),
+                        Categoria: ["Moda", "Eletrônicos", "Casa"][rand(3)],
+                        Preço: moeda(5000),
+                        Status: ["Pago", "Enviado", "Entregue"][rand(3)],
+                        Cliente: "Cliente " + rand(999)
+                    };
+                }
+
+                if (categoria === "Educação") {
+                    base = {
+                        Aluno: "Aluno " + (i + 1),
+                        Curso: ["Engenharia", "TI", "Administração"][rand(3)],
+                        Nota: randFloat(10),
+                        Frequência: rand(100) + "%",
+                        Situação: ["Aprovado", "Reprovado"][rand(2)]
+                    };
+                }
+
+                if (categoria === "Saúde") {
+                    base = {
+                        Paciente: "Paciente " + (i + 1),
+                        Idade: rand(90) + 1,
+                        Especialidade: ["Clínico", "Ortopedia", "Cardio"][rand(3)],
+                        Atendimento: ["Consulta", "Exame"][rand(2)],
+                        Status: ["Ativo", "Alta"][rand(2)]
+                    };
+                }
+
+                dadosGlobais.push(ajustarColunas(base, colunas));
+            }
+
+            renderTabela();
+        }
+
+        /* COLUNAS */
+        function ajustarColunas(base, total) {
+            const obj = { ...base };
+            let atual = Object.keys(obj).length;
+            for (let i = atual + 1; i <= total; i++) {
+                obj["Extra_" + (i - atual)] = gerarValorAleatorio();
+            }
+            return obj;
+        }
+
+        /* RENDER */
+        function renderTabela() {
+            const tabela = document.getElementById("tabela");
+            if(dadosGlobais.length === 0) {
+                tabela.innerHTML = "";
+                return;
+            }
+            let html = "<table><thead><tr>";
+            Object.keys(dadosGlobais[0]).forEach(c => html += `<th>${c}</th>`);
+            html += "</tr></thead><tbody>";
+
+            dadosGlobais.forEach(l => {
+                html += "<tr>";
+                Object.values(l).forEach(v => html += `<td>${v}</td>`);
+                html += "</tr>";
+            });
+
+            html += "</tbody></table>";
+            tabela.innerHTML = html;
+        }
+
+        /* CSV */
+        function baixarCSV() {
+            if (!dadosGlobais.length) return alert("Gere os dados primeiro.");
+            const csv = [
+                Object.keys(dadosGlobais[0]).join(","),
+                ...dadosGlobais.map(r => Object.values(r).join(","))
+            ].join("\n");
+
+            const blob = new Blob([csv], { type: "text/csv" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "datta_lab.csv";
+            a.click();
+        }
+
+        /* XLSX */
+        function baixarXLSX() {
+            if (!dadosGlobais.length) return alert("Gere os dados primeiro.");
+            const ws = XLSX.utils.json_to_sheet(dadosGlobais);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Dados");
+            XLSX.writeFile(wb, "datta_lab.xlsx");
+        }
+
+        /* HELPERS */
+        function rand(max) { return Math.floor(Math.random() * max); }
+        function randFloat(max) { return (Math.random() * max).toFixed(2); }
+        function moeda(max) { return (Math.random() * max).toFixed(2); }
+        function data() { return new Date().toLocaleDateString(); }
+
+        function gerarValorAleatorio() {
+            return [
+                () => rand(1000),
+                () => randFloat(10000),
+                () => ["Sim", "Não"][rand(2)],
+                () => data(),
+                () => "Valor_" + rand(999)
+            ][rand(5)]();
+        }
+        
+        // Auto-gerar ao carregar a página
+        window.addEventListener('DOMContentLoaded', () => {
+            gerar();
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
