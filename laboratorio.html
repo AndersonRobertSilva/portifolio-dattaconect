@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="assets/favicon.png">
+    
     <!-- XLSX LIB -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -140,6 +141,52 @@
             <p class="reveal-up" style="transition-delay: 0.1s;">Onde ideias se transformam em protótipos de dados inovadores.</p>
         </div>
     </section>
+
+    <section class="page-content">
+        <div class="container text-content reveal-up">
+            <h2>Testando o Futuro</h2>
+            <p>A área de laboratório é o nosso espaço de inovação aberta. Aqui, compartilhamos experimentos, protótipos de novas integrações e estudos de caso focados em tecnologias emergentes como Inteligência Artificial aliada a Dados e Analytics Preditivo.</p>
+            
+            <div class="lab-container">
+                <!-- SIDEBAR -->
+                <div class="lab-sidebar">
+                    <h3>Configurações</h3>
+                    <label>Categoria</label>
+                    <select id="categoria">
+                        <option>Empresarial</option>
+                        <option>Financeiro</option>
+                        <option>Instagram</option>
+                        <option>E-commerce</option>
+                        <option>Educação</option>
+                        <option>Saúde</option>
+                    </select>
+
+                    <label>Nº de Linhas</label>
+                    <input type="number" id="linhas" value="10" min="1" max="100000">
+
+                    <label>Nº de Colunas (até 20)</label>
+                    <input type="number" id="colunas" value="5" min="1" max="20">
+
+                    <button onclick="gerar()">Gerar Dados</button>
+                    <button onclick="baixarCSV()" style="background: #10b981;">Download CSV</button>
+                    <button onclick="baixarXLSX()" style="background: #f59e0b;">Download XLSX</button>
+                </div>
+
+                <!-- MAIN -->
+                <div class="lab-main">
+                    <h3>Datta Lab - Gerador</h3>
+                    <p>Geração de bases fictícias para prática em BI e Analytics.</p>
+
+                    <div class="table-wrapper">
+                        <div id="tabela"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
             <div class="footer-brand">
                 <a href="/" class="logo">Datta<span>Conect</span></a>
                 <p>Transformando dados complexos em decisões simples, rápidas e seguras para a sua empresa.</p>
@@ -329,4 +376,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
