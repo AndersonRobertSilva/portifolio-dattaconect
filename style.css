@@ -800,18 +800,16 @@ footer {
     justify-items: center;
 }
 
-.client-logo, .integration-logo {
-    max-width: 140px;
-    height: 50px;
+.client-logo {
+    max-width: 110px; /* Reduzido o tamanho da logo em pouca coisa conforme solicitado */
+    height: 45px;
     object-fit: contain;
-    filter: none; /* Mantendo cores originais para consistência */
-    opacity: 0.8;
-    transition: all 0.3s ease;
+    filter: none;
+    transition: transform 0.3s ease;
 }
 
-.client-logo:hover, .integration-logo:hover {
-    opacity: 1;
-    transform: scale(1.05);
+.client-logo:hover {
+    transform: scale(1.1);
 }
 
 /* -------------------
@@ -878,19 +876,41 @@ footer {
 ------------------- */
 .clients-section {
     padding: 6rem 0;
-    background: var(--bg-color);
-    border-top: 1px solid var(--glass-border);
+    background: #FFFFFF; /* Fundo branco conforme imagem */
+    color: #333333;
+}
+
+.clients-section .section-header {
+    text-align: left;
+    margin-bottom: 4rem;
+}
+
+.clients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 3rem;
+    align-items: center;
+    justify-items: center;
+}
+
+.client-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 /* -------------------
    RESPONSIVE DESIGN (UPDATES)
 ------------------- */
 @media (max-width: 768px) {
-    .logo-grid {
+    .clients-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
     }
     
     .integrations-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
     }
 }
