@@ -817,31 +817,12 @@ footer {
 ------------------- */
 .integrations-section {
     padding: 6rem 0;
-    background: #FFFFFF; /* Fundo branco conforme imagem */
-    color: #333333;
+    background: var(--bg-secondary);
 }
 
 .integrations-section .section-header {
-    text-align: left;
+    text-align: center;
     margin-bottom: 4rem;
-}
-
-.section-title-pattern {
-    font-size: 2rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: #1a1a1a;
-}
-
-.section-title-pattern::before {
-    content: '';
-    display: inline-block;
-    width: 4px;
-    height: 30px;
-    background: #000000;
-    border-radius: 2px;
 }
 
 .integrations-grid {
@@ -876,12 +857,12 @@ footer {
 ------------------- */
 .clients-section {
     padding: 6rem 0;
-    background: #FFFFFF; /* Fundo branco conforme imagem */
-    color: #333333;
+    background: var(--bg-color);
+    border-top: 1px solid var(--glass-border);
 }
 
 .clients-section .section-header {
-    text-align: left;
+    text-align: center;
     margin-bottom: 4rem;
 }
 
