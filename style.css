@@ -777,3 +777,94 @@ footer {
 .project-card h3 {
     margin-bottom: 0.5rem;
 }
+/* -------------------
+   CLIENTS SECTION
+------------------- */
+.clients-section {
+    padding: 4rem 0;
+    background: var(--bg-color);
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+    overflow: hidden;
+}
+
+.clients-section .section-header {
+    margin-bottom: 3rem;
+}
+
+.logo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 2rem;
+    align-items: center;
+    justify-items: center;
+}
+
+.client-logo, .integration-logo {
+    max-width: 140px;
+    height: 50px;
+    object-fit: contain;
+    filter: brightness(0) invert(1) opacity(0.6);
+    transition: all 0.3s ease;
+}
+
+.client-logo:hover, .integration-logo:hover {
+    filter: brightness(0) invert(1) opacity(1);
+    transform: scale(1.05);
+}
+
+/* -------------------
+   INTEGRATIONS SECTION
+------------------- */
+.integrations-section {
+    padding: 8rem 0;
+    background: var(--bg-secondary);
+    position: relative;
+}
+
+.integrations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-top: 4rem;
+}
+
+.integration-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+}
+
+.integration-card img, .integration-card i {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.integration-card span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.integration-card:hover span {
+    color: var(--text-primary);
+}
+
+/* -------------------
+   RESPONSIVE DESIGN (UPDATES)
+------------------- */
+@media (max-width: 768px) {
+    .logo-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .integrations-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
