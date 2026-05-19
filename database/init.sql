@@ -93,35 +93,35 @@ ON CONFLICT DO NOTHING;
 
 -- Módulos Power BI
 INSERT INTO modules (id, course_id, titulo, descricao, ordem) VALUES
-('m1000001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Introdução ao Power BI', 'Primeiros passos', 1),
-('m1000002-0000-0000-0000-000000000002', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Fontes de Dados', 'Importação e transformação', 2),
-('m1000003-0000-0000-0000-000000000003', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Visualizações', 'Gráficos e painéis', 3),
-('m1000004-0000-0000-0000-000000000004', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'DAX Avançado', 'Fórmulas avançadas', 4)
+('11000001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Introdução ao Power BI', 'Primeiros passos', 1),
+('11000002-0000-0000-0000-000000000002', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Fontes de Dados', 'Importação e transformação', 2),
+('11000003-0000-0000-0000-000000000003', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Visualizações', 'Gráficos e painéis', 3),
+('11000004-0000-0000-0000-000000000004', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'DAX Avançado', 'Fórmulas avançadas', 4)
 ON CONFLICT DO NOTHING;
 
 -- Módulos SQL
 INSERT INTO modules (id, course_id, titulo, descricao, ordem) VALUES
-('m2000001-0000-0000-0000-000000000001', 'b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Fundamentos do SQL', 'SELECT, WHERE, ORDER BY', 1),
-('m2000002-0000-0000-0000-000000000002', 'b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Joins e Relacionamentos', 'INNER, LEFT, RIGHT JOIN', 2)
+('21000001-0000-0000-0000-000000000001', 'b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Fundamentos do SQL', 'SELECT, WHERE, ORDER BY', 1),
+('21000002-0000-0000-0000-000000000002', 'b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Joins e Relacionamentos', 'INNER, LEFT, RIGHT JOIN', 2)
 ON CONFLICT DO NOTHING;
 
 -- Aulas Power BI Mod 1
 INSERT INTO lessons (id, module_id, titulo, descricao, video_url, duracao, ordem, gratuita) VALUES
-('l1000001-0000-0000-0000-000000000001', 'm1000001-0000-0000-0000-000000000001', 'Bem-vindo ao Curso', 'Apresentação', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '10 min', 1, TRUE),
-('l1000002-0000-0000-0000-000000000002', 'm1000001-0000-0000-0000-000000000001', 'Instalando o Power BI', 'Download e configuração', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '15 min', 2, TRUE),
-('l1000003-0000-0000-0000-000000000003', 'm1000001-0000-0000-0000-000000000001', 'Interface e Navegação', 'Conhecendo a interface', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '20 min', 3, FALSE)
+('12000001-0000-0000-0000-000000000001', '11000001-0000-0000-0000-000000000001', 'Bem-vindo ao Curso', 'Apresentação', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '10 min', 1, TRUE),
+('12000002-0000-0000-0000-000000000002', '11000001-0000-0000-0000-000000000001', 'Instalando o Power BI', 'Download e configuração', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '15 min', 2, TRUE),
+('12000003-0000-0000-0000-000000000003', '11000001-0000-0000-0000-000000000001', 'Interface e Navegação', 'Conhecendo a interface', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '20 min', 3, FALSE)
 ON CONFLICT DO NOTHING;
 
 -- Aulas Power BI Mod 2
 INSERT INTO lessons (id, module_id, titulo, descricao, video_url, duracao, ordem, gratuita) VALUES
-('l1000004-0000-0000-0000-000000000004', 'm1000002-0000-0000-0000-000000000002', 'Conectando ao Excel', 'Importando planilhas', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '18 min', 1, FALSE),
-('l1000005-0000-0000-0000-000000000005', 'm1000002-0000-0000-0000-000000000002', 'Conectando ao SQL Server', 'Conexão com banco', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '22 min', 2, FALSE)
+('12000004-0000-0000-0000-000000000004', '11000002-0000-0000-0000-000000000002', 'Conectando ao Excel', 'Importando planilhas', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '18 min', 1, FALSE),
+('12000005-0000-0000-0000-000000000005', '11000002-0000-0000-0000-000000000002', 'Conectando ao SQL Server', 'Conexão com banco', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '22 min', 2, FALSE)
 ON CONFLICT DO NOTHING;
 
 -- Aulas SQL Mod 1
 INSERT INTO lessons (id, module_id, titulo, descricao, video_url, duracao, ordem, gratuita) VALUES
-('l2000001-0000-0000-0000-000000000001', 'm2000001-0000-0000-0000-000000000001', 'O que é SQL?', 'Introdução à linguagem', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '12 min', 1, TRUE),
-('l2000002-0000-0000-0000-000000000002', 'm2000001-0000-0000-0000-000000000001', 'SELECT e FROM', 'Primeira consulta', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '18 min', 2, TRUE)
+('22000001-0000-0000-0000-000000000001', '21000001-0000-0000-0000-000000000001', 'O que é SQL?', 'Introdução à linguagem', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '12 min', 1, TRUE),
+('22000002-0000-0000-0000-000000000002', '21000001-0000-0000-0000-000000000001', 'SELECT e FROM', 'Primeira consulta', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '18 min', 2, TRUE)
 ON CONFLICT DO NOTHING;
 
 -- Trigger updated_at

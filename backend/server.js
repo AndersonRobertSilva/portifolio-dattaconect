@@ -124,15 +124,15 @@ async function runInlineInit() {
     ON CONFLICT DO NOTHING`);
     // Modules seed
     await pool.query(`INSERT INTO modules (id, course_id, titulo, descricao, ordem) VALUES
-        ('m1000001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Introdução ao Power BI', 'Primeiros passos', 1),
-        ('m1000002-0000-0000-0000-000000000002', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Fontes de Dados', 'Importação e transformação', 2),
-        ('m2000001-0000-0000-0000-000000000001', 'b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Fundamentos do SQL', 'SELECT, WHERE, ORDER BY', 1)
+        ('11000001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Introdução ao Power BI', 'Primeiros passos', 1),
+        ('11000002-0000-0000-0000-000000000002', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Fontes de Dados', 'Importação e transformação', 2),
+        ('21000001-0000-0000-0000-000000000001', 'b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Fundamentos do SQL', 'SELECT, WHERE, ORDER BY', 1)
     ON CONFLICT DO NOTHING`);
     // Lessons seed
     await pool.query(`INSERT INTO lessons (id, module_id, titulo, descricao, video_url, duracao, ordem, gratuita) VALUES
-        ('l1000001-0000-0000-0000-000000000001', 'm1000001-0000-0000-0000-000000000001', 'Bem-vindo ao Curso', 'Apresentação', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '10 min', 1, TRUE),
-        ('l1000002-0000-0000-0000-000000000002', 'm1000001-0000-0000-0000-000000000001', 'Instalando o Power BI', 'Download e configuração', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '15 min', 2, TRUE),
-        ('l2000001-0000-0000-0000-000000000001', 'm2000001-0000-0000-0000-000000000001', 'O que é SQL?', 'Introdução à linguagem', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '12 min', 1, TRUE)
+        ('12000001-0000-0000-0000-000000000001', '11000001-0000-0000-0000-000000000001', 'Bem-vindo ao Curso', 'Apresentação', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '10 min', 1, TRUE),
+        ('12000002-0000-0000-0000-000000000002', '11000001-0000-0000-0000-000000000001', 'Instalando o Power BI', 'Download e configuração', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '15 min', 2, TRUE),
+        ('22000001-0000-0000-0000-000000000001', '21000001-0000-0000-0000-000000000001', 'O que é SQL?', 'Introdução à linguagem', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '12 min', 1, TRUE)
     ON CONFLICT DO NOTHING`);
     console.log('✅ Banco inicializado com dados inline');
 }
