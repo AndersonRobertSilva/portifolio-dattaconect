@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Datta Conect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+<body>
+    <header id="header" class="member-header">
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">Datta<span>Conect</span></a>
+            <nav class="desktop-nav">
+                <ul>
+                    <li><a href="/admin" class="nav-active">Dashboard</a></li>
+                    <li><a href="/membros">Área do Aluno</a></li>
+                    <li><a href="/treinamentos">Site</a></li>
+                </ul>
+            </nav>
+            <div class="member-actions">
+                <span class="admin-badge"><i class="fas fa-shield-alt"></i> Admin</span>
+                <button class="btn btn-outline btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Abrir Menu"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="mobile-menu-overlay"></div>
+    <nav class="mobile-menu">
+        <button class="close-menu-btn"><i class="fas fa-times"></i></button>
+        <ul>
+            <li><a href="/admin">Dashboard</a></li>
+            <li><a href="/membros">Área do Aluno</a></li>
+            <li><a href="/treinamentos">Site</a></li>
+            <li><a href="#" onclick="logout()">Sair</a></li>
+        </ul>
+    </nav>
+
+    <section class="admin-section">
+        <div class="container">
+            <!-- STATS -->
+            <div class="admin-stats reveal-up" id="admin-stats">
+                <div class="stat-card glass-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-value" id="s-alunos">0</div>
+                    <div class="stat-label">Alunos</div>
+                </div>
+                <div class="stat-card glass-card">
+                    <i class="fas fa-graduation-cap"></i>
+                    <div class="stat-value" id="s-cursos">0</div>
+                    <div class="stat-label">Cursos</div>
+                </div>
+                <div class="stat-card glass-card">
+                    <i class="fas fa-clipboard-list"></i>
+                    <div class="stat-value" id="s-matriculas">0</div>
+                    <div class="stat-label">Matrículas</div>
+                </div>
+                <div class="stat-card glass-card">
+                    <i class="fas fa-play-circle"></i>
+                    <div class="stat-value" id="s-aulas">0</div>
+                    <div class="stat-label">Aulas</div>
+                </div>
+            </div>
+
+            <!-- TABS -->
+            <div class="admin-tabs reveal-up">
+                <button class="admin-tab active" onclick="showTab('courses')"><i class="fas fa-book"></i> Cursos</button>
+                <button class="admin-tab" onclick="showTab('users')"><i class="fas fa-users"></i> Alunos</button>
+            </div>
+
+            <!-- COURSES TAB -->
+            <div class="admin-content" id="tab-courses">
+                <div class="admin-toolbar">
+                    <h2>Gerenciar Cursos</h2>
+                    <button class="btn btn-primary btn-sm" onclick="showCourseModal()"><i class="fas fa-plus"></i> Novo Curso</button>
+                </div>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table" id="courses-table">
+                        <thead><tr><th>Título</th><th>Categoria</th><th>Nível</th><th>Duração</th><th>Status</th><th>Ações</th></tr></thead>
+                        <tbody id="courses-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- USERS TAB -->
+            <div class="admin-content" id="tab-users" style="display:none;">
+                <div class="admin-toolbar">
+                    <h2>Alunos Cadastrados</h2>
+                </div>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table" id="users-table">
+                        <thead><tr><th>Nome</th><th>Email</th><th>Tipo</th><th>Status</th><th>Cadastro</th></tr></thead>
+                        <tbody id="users-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- COURSE MODULES/LESSONS MANAGER -->
+            <div class="admin-content" id="course-detail" style="display:none;">
+                <div class="admin-toolbar">
+                    <button class="btn btn-outline btn-sm" onclick="backToCourses()"><i class="fas fa-arrow-left"></i> Voltar</button>
+                    <h2 id="detail-course-title"></h2>
+                </div>
+                <div class="admin-toolbar" style="margin-top:1rem;">
+                    <h3>Módulos e Aulas</h3>
+                    <button class="btn btn-primary btn-sm" onclick="showModuleModal()"><i class="fas fa-plus"></i> Novo Módulo</button>
+                </div>
+                <div id="modules-manager"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: Course -->
+    <div class="modal-overlay" id="course-modal" style="display:none;">
+        <div class="modal glass-card">
+            <div class="modal-header"><h3 id="course-modal-title">Novo Curso</h3><button onclick="closeModal('course-modal')">&times;</button></div>
+            <form id="course-form" class="auth-form">
+                <div class="form-group"><label>Título</label><input type="text" id="cf-titulo" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Categoria</label><input type="text" id="cf-categoria" placeholder="Business Intelligence"></div>
+                    <div class="form-group"><label>Nível</label><select id="cf-nivel"><option>Iniciante</option><option>Intermediário</option><option>Avançado</option></select></div>
+                </div>
+                <div class="form-group"><label>Duração</label><input type="text" id="cf-duracao" placeholder="40 horas"></div>
+                <div class="form-group"><label>Descrição curta</label><input type="text" id="cf-descricao-curta" maxlength="300"></div>
+                <div class="form-group"><label>Descrição completa</label><textarea id="cf-descricao" rows="3"></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Preço (R$)</label><input type="number" id="cf-preco" step="0.01" value="0"></div>
+                    <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:24px;">
+                        <input type="checkbox" id="cf-destaque"><label for="cf-destaque" style="margin:0;">Destaque</label>
+                    </div>
+                </div>
+                <input type="hidden" id="cf-id">
+                <button type="submit" class="btn btn-primary btn-full">Salvar Curso</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Module -->
+    <div class="modal-overlay" id="module-modal" style="display:none;">
+        <div class="modal glass-card">
+            <div class="modal-header"><h3>Novo Módulo</h3><button onclick="closeModal('module-modal')">&times;</button></div>
+            <form id="module-form" class="auth-form">
+                <div class="form-group"><label>Título</label><input type="text" id="mf-titulo" required></div>
+                <div class="form-group"><label>Descrição</label><input type="text" id="mf-descricao"></div>
+                <div class="form-group"><label>Ordem</label><input type="number" id="mf-ordem" value="0"></div>
+                <input type="hidden" id="mf-id">
+                <button type="submit" class="btn btn-primary btn-full">Salvar Módulo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Lesson -->
+    <div class="modal-overlay" id="lesson-modal" style="display:none;">
+        <div class="modal glass-card">
+            <div class="modal-header"><h3>Nova Aula</h3><button onclick="closeModal('lesson-modal')">&times;</button></div>
+            <form id="lesson-form" class="auth-form">
+                <div class="form-group"><label>Título</label><input type="text" id="lf-titulo" required></div>
+                <div class="form-group"><label>URL do Vídeo</label><input type="url" id="lf-video-url" placeholder="https://youtube.com/embed/..."></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Duração</label><input type="text" id="lf-duracao" placeholder="15 min"></div>
+                    <div class="form-group"><label>Ordem</label><input type="number" id="lf-ordem" value="0"></div>
+                </div>
+                <div class="form-group"><label>Descrição</label><textarea id="lf-descricao" rows="2"></textarea></div>
+                <div class="form-group" style="display:flex;align-items:center;gap:8px;">
+                    <input type="checkbox" id="lf-gratuita"><label for="lf-gratuita" style="margin:0;">Aula gratuita (preview)</label>
+                </div>
+                <input type="hidden" id="lf-id">
+                <input type="hidden" id="lf-module-id">
+                <button type="submit" class="btn btn-primary btn-full">Salvar Aula</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const token = localStorage.getItem('datta_token');
+        const user = JSON.parse(localStorage.getItem('datta_user') || '{}');
+        if (!token || user.role !== 'admin') window.location.href = '/login';
+
+        let currentCourseId = null;
+
+        function authHeaders() { return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }; }
+        function logout() { localStorage.removeItem('datta_token'); localStorage.removeItem('datta_user'); window.location.href = '/login'; }
+
+        function showTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="showTab('${tab}')"]`).classList.add('active');
+            document.getElementById('tab-courses').style.display = tab === 'courses' ? '' : 'none';
+            document.getElementById('tab-users').style.display = tab === 'users' ? '' : 'none';
+            document.getElementById('course-detail').style.display = 'none';
+            if (tab === 'users') loadUsers();
+            if (tab === 'courses') loadCourses();
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // ============ STATS ============
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/admin/stats', { headers: authHeaders() });
+                const s = await res.json();
+                document.getElementById('s-alunos').textContent = s.totalAlunos;
+                document.getElementById('s-cursos').textContent = s.totalCursos;
+                document.getElementById('s-matriculas').textContent = s.totalMatriculas;
+                document.getElementById('s-aulas').textContent = s.totalAulas;
+            } catch (e) {}
+        }
+
+        // ============ COURSES ============
+        async function loadCourses() {
+            try {
+                const res = await fetch('/api/courses');
+                const courses = await res.json();
+                document.getElementById('courses-tbody').innerHTML = courses.map(c => `
+                    <tr>
+                        <td><strong>${c.titulo}</strong></td>
+                        <td>${c.categoria || '-'}</td>
+                        <td><span class="table-badge">${c.nivel}</span></td>
+                        <td>${c.duracao || '-'}</td>
+                        <td><span class="table-badge ${c.ativo ? 'badge-green' : 'badge-red'}">${c.ativo ? 'Ativo' : 'Inativo'}</span></td>
+                        <td class="table-actions">
+                            <button class="btn-icon" onclick="manageCourse('${c.id}')" title="Módulos/Aulas"><i class="fas fa-list"></i></button>
+                            <button class="btn-icon" onclick="editCourse('${c.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon btn-danger" onclick="deleteCourse('${c.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {}
+        }
+
+        function showCourseModal(course) {
+            document.getElementById('course-modal-title').textContent = course ? 'Editar Curso' : 'Novo Curso';
+            document.getElementById('cf-id').value = course?.id || '';
+            document.getElementById('cf-titulo').value = course?.titulo || '';
+            document.getElementById('cf-categoria').value = course?.categoria || '';
+            document.getElementById('cf-nivel').value = course?.nivel || 'Iniciante';
+            document.getElementById('cf-duracao').value = course?.duracao || '';
+            document.getElementById('cf-descricao-curta').value = course?.descricao_curta || '';
+            document.getElementById('cf-descricao').value = course?.descricao || '';
+            document.getElementById('cf-preco').value = course?.preco || 0;
+            document.getElementById('cf-destaque').checked = course?.destaque || false;
+            document.getElementById('course-modal').style.display = 'flex';
+        }
+
+        document.getElementById('course-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('cf-id').value;
+            const body = {
+                titulo: document.getElementById('cf-titulo').value,
+                categoria: document.getElementById('cf-categoria').value,
+                nivel: document.getElementById('cf-nivel').value,
+                duracao: document.getElementById('cf-duracao').value,
+                descricao_curta: document.getElementById('cf-descricao-curta').value,
+                descricao: document.getElementById('cf-descricao').value,
+                preco: parseFloat(document.getElementById('cf-preco').value) || 0,
+                destaque: document.getElementById('cf-destaque').checked,
+                ativo: true
+            };
+            try {
+                const url = id ? '/api/admin/courses/' + id : '/api/admin/courses';
+                await fetch(url, { method: id ? 'PUT' : 'POST', headers: authHeaders(), body: JSON.stringify(body) });
+                closeModal('course-modal');
+                loadCourses();
+                loadStats();
+            } catch (e) { alert('Erro ao salvar'); }
+        });
+
+        async function editCourse(id) {
+            const res = await fetch('/api/courses/' + id);
+            const course = await res.json();
+            showCourseModal(course);
+        }
+
+        async function deleteCourse(id) {
+            if (!confirm('Excluir este curso e todos os módulos/aulas?')) return;
+            await fetch('/api/admin/courses/' + id, { method: 'DELETE', headers: authHeaders() });
+            loadCourses(); loadStats();
+        }
+
+        // ============ MANAGE MODULES/LESSONS ============
+        async function manageCourse(id) {
+            currentCourseId = id;
+            document.getElementById('tab-courses').style.display = 'none';
+            document.getElementById('course-detail').style.display = '';
+            const res = await fetch('/api/courses/' + id);
+            const course = await res.json();
+            document.getElementById('detail-course-title').textContent = course.titulo;
+            renderModules(course.modules || []);
+        }
+
+        function backToCourses() {
+            document.getElementById('course-detail').style.display = 'none';
+            document.getElementById('tab-courses').style.display = '';
+        }
+
+        function renderModules(modules) {
+            document.getElementById('modules-manager').innerHTML = modules.map(mod => `
+                <div class="admin-module glass-card">
+                    <div class="admin-module-header">
+                        <h4><i class="fas fa-folder"></i> ${mod.titulo}</h4>
+                        <div>
+                            <button class="btn-icon" onclick="showLessonModal('${mod.id}')" title="Adicionar Aula"><i class="fas fa-plus"></i></button>
+                            <button class="btn-icon btn-danger" onclick="deleteModule('${mod.id}')" title="Excluir Módulo"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="admin-lessons">
+                        ${(mod.lessons || []).map(les => `
+                            <div class="admin-lesson-item">
+                                <span>${les.gratuita ? '<i class="fas fa-unlock" style="color:#10b981;"></i>' : '<i class="fas fa-lock" style="color:var(--text-secondary);"></i>'} ${les.titulo} <small style="color:var(--text-secondary);">(${les.duracao || 'N/A'})</small></span>
+                                <div>
+                                    <button class="btn-icon" onclick="editLesson('${les.id}', '${mod.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-icon btn-danger" onclick="deleteLesson('${les.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${mod.lessons?.length === 0 ? '<p style="color:var(--text-secondary);font-size:0.9rem;padding:8px 0;">Nenhuma aula neste módulo</p>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showModuleModal() {
+            document.getElementById('mf-id').value = '';
+            document.getElementById('mf-titulo').value = '';
+            document.getElementById('mf-descricao').value = '';
+            document.getElementById('mf-ordem').value = '0';
+            document.getElementById('module-modal').style.display = 'flex';
+        }
+
+        document.getElementById('module-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = {
+                course_id: currentCourseId,
+                titulo: document.getElementById('mf-titulo').value,
+                descricao: document.getElementById('mf-descricao').value,
+                ordem: parseInt(document.getElementById('mf-ordem').value) || 0
+            };
+            await fetch('/api/admin/modules', { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) });
+            closeModal('module-modal');
+            manageCourse(currentCourseId);
+        });
+
+        async function deleteModule(id) {
+            if (!confirm('Excluir módulo e todas as aulas?')) return;
+            await fetch('/api/admin/modules/' + id, { method: 'DELETE', headers: authHeaders() });
+            manageCourse(currentCourseId);
+        }
+
+        function showLessonModal(moduleId) {
+            document.getElementById('lf-id').value = '';
+            document.getElementById('lf-module-id').value = moduleId;
+            document.getElementById('lf-titulo').value = '';
+            document.getElementById('lf-video-url').value = '';
+            document.getElementById('lf-duracao').value = '';
+            document.getElementById('lf-ordem').value = '0';
+            document.getElementById('lf-descricao').value = '';
+            document.getElementById('lf-gratuita').checked = false;
+            document.getElementById('lesson-modal').style.display = 'flex';
+        }
+
+        document.getElementById('lesson-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('lf-id').value;
+            const body = {
+                module_id: document.getElementById('lf-module-id').value,
+                titulo: document.getElementById('lf-titulo').value,
+                video_url: document.getElementById('lf-video-url').value,
+                duracao: document.getElementById('lf-duracao').value,
+                ordem: parseInt(document.getElementById('lf-ordem').value) || 0,
+                descricao: document.getElementById('lf-descricao').value,
+                gratuita: document.getElementById('lf-gratuita').checked,
+                ativo: true
+            };
+            const url = id ? '/api/admin/lessons/' + id : '/api/admin/lessons';
+            await fetch(url, { method: id ? 'PUT' : 'POST', headers: authHeaders(), body: JSON.stringify(body) });
+            closeModal('lesson-modal');
+            manageCourse(currentCourseId);
+            loadStats();
+        });
+
+        async function editLesson(lessonId, moduleId) {
+            const res = await fetch('/api/lessons/' + lessonId, { headers: authHeaders() });
+            const l = await res.json();
+            document.getElementById('lf-id').value = l.id;
+            document.getElementById('lf-module-id').value = moduleId;
+            document.getElementById('lf-titulo').value = l.titulo;
+            document.getElementById('lf-video-url').value = l.video_url || '';
+            document.getElementById('lf-duracao').value = l.duracao || '';
+            document.getElementById('lf-ordem').value = l.ordem || 0;
+            document.getElementById('lf-descricao').value = l.descricao || '';
+            document.getElementById('lf-gratuita').checked = l.gratuita;
+            document.getElementById('lesson-modal').style.display = 'flex';
+        }
+
+        async function deleteLesson(id) {
+            if (!confirm('Excluir esta aula?')) return;
+            await fetch('/api/admin/lessons/' + id, { method: 'DELETE', headers: authHeaders() });
+            manageCourse(currentCourseId);
+            loadStats();
+        }
+
+        // ============ USERS ============
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/admin/users', { headers: authHeaders() });
+                const users = await res.json();
+                document.getElementById('users-tbody').innerHTML = users.map(u => `
+                    <tr>
+                        <td>${u.nome}</td>
+                        <td>${u.email}</td>
+                        <td><span class="table-badge ${u.role === 'admin' ? 'badge-purple' : ''}">${u.role}</span></td>
+                        <td><span class="table-badge ${u.ativo ? 'badge-green' : 'badge-red'}">${u.ativo ? 'Ativo' : 'Inativo'}</span></td>
+                        <td>${new Date(u.created_at).toLocaleDateString('pt-BR')}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {}
+        }
+
+        // Init
+        loadStats();
+        loadCourses();
+    </script>
+</body>
+</html>

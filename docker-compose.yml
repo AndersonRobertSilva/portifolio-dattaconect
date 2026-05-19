@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: dattaconect
+      POSTGRES_USER: datta
+      POSTGRES_PASSWORD: datta123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://datta:datta123@db:5432/dattaconect
+      JWT_SECRET: dattaconect_jwt_secret_2026_production
+      PORT: 3001
+    ports:
+      - "3001:3001"
+
+  frontend:
+    build: .
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+
+volumes:
+  pgdata:

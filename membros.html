@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área de Membros - Datta Conect</title>
+    <meta name="description" content="Sua área exclusiva de treinamentos Datta Conect.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+<body>
+    <!-- MEMBER HEADER -->
+    <header id="header" class="member-header">
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">Datta<span>Conect</span></a>
+            <nav class="desktop-nav">
+                <ul>
+                    <li><a href="/treinamentos">Catálogo</a></li>
+                    <li><a href="/membros" class="nav-active">Meus Cursos</a></li>
+                </ul>
+            </nav>
+            <div class="member-actions">
+                <span class="member-greeting" id="member-name"></span>
+                <button class="btn btn-outline btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Abrir Menu"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="mobile-menu-overlay"></div>
+    <nav class="mobile-menu">
+        <button class="close-menu-btn"><i class="fas fa-times"></i></button>
+        <ul>
+            <li><a href="/treinamentos">Catálogo</a></li>
+            <li><a href="/membros">Meus Cursos</a></li>
+            <li><a href="#" onclick="logout()">Sair</a></li>
+        </ul>
+    </nav>
+
+    <!-- DASHBOARD VIEW -->
+    <section class="member-dashboard" id="dashboard-view">
+        <div class="container">
+            <div class="dashboard-header reveal-up">
+                <div>
+                    <h1>Olá, <span class="gradient-text" id="dash-name">Aluno</span>!</h1>
+                    <p>Continue de onde parou ou explore novos cursos.</p>
+                </div>
+                <a href="/treinamentos" class="btn btn-primary"><i class="fas fa-plus"></i> Explorar Cursos</a>
+            </div>
+
+            <!-- MY COURSES -->
+            <div class="my-courses-grid" id="my-courses">
+                <div class="courses-loading"><i class="fas fa-spinner fa-spin"></i><p>Carregando seus cursos...</p></div>
+            </div>
+
+            <!-- AVAILABLE COURSES -->
+            <div class="section-header reveal-up" style="margin-top: 4rem;">
+                <h2>Cursos <span class="gradient-text">Disponíveis</span></h2>
+                <p>Matricule-se gratuitamente e comece a aprender.</p>
+            </div>
+            <div class="courses-grid" id="available-courses"></div>
+        </div>
+    </section>
+
+    <!-- COURSE PLAYER VIEW -->
+    <section class="course-player" id="player-view" style="display:none;">
+        <div class="container">
+            <button class="btn btn-outline btn-sm" onclick="showDashboard()" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-arrow-left"></i> Voltar aos Cursos
+            </button>
+            <div class="player-layout">
+                <!-- VIDEO AREA -->
+                <div class="player-main">
+                    <div class="video-container" id="video-container">
+                        <div class="video-placeholder"><i class="fas fa-play-circle"></i><p>Selecione uma aula para começar</p></div>
+                    </div>
+                    <div class="lesson-info" id="lesson-info">
+                        <h2 id="lesson-title">Selecione uma aula</h2>
+                        <p id="lesson-desc"></p>
+                        <button class="btn btn-primary btn-sm" id="complete-btn" style="display:none;" onclick="completeLesson()">
+                            <i class="fas fa-check"></i> Marcar como Concluída
+                        </button>
+                    </div>
+                </div>
+                <!-- SIDEBAR -->
+                <div class="player-sidebar">
+                    <div class="player-sidebar-header">
+                        <h3 id="player-course-title">Conteúdo do Curso</h3>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+                            <span id="progress-text">0%</span>
+                        </div>
+                    </div>
+                    <div class="modules-list" id="modules-list"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+        // Auth check
+        const token = localStorage.getItem('datta_token');
+        const user = JSON.parse(localStorage.getItem('datta_user') || '{}');
+        if (!token) window.location.href = '/login';
+        if (user.role === 'admin') {
+            // Admin can also access members area
+        }
+
+        // Set user name
+        document.getElementById('member-name').textContent = user.nome || 'Membro';
+        document.getElementById('dash-name').textContent = (user.nome || 'Aluno').split(' ')[0];
+
+        let currentCourseId = null;
+        let currentLessonId = null;
+        let completedLessons = [];
+
+        function logout() {
+            localStorage.removeItem('datta_token');
+            localStorage.removeItem('datta_user');
+            window.location.href = '/login';
+        }
+
+        function authHeaders() {
+            return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+        }
+
+        // Load dashboard
+        async function loadDashboard() {
+            try {
+                const [myRes, allRes] = await Promise.all([
+                    fetch('/api/my-courses', { headers: authHeaders() }),
+                    fetch('/api/courses')
+                ]);
+                const myCourses = await myRes.json();
+                const allCourses = await allRes.json();
+
+                // My courses
+                const myGrid = document.getElementById('my-courses');
+                if (myCourses.length === 0) {
+                    myGrid.innerHTML = '<div class="empty-state glass-card"><i class="fas fa-book-open"></i><h3>Nenhum curso matriculado</h3><p>Explore o catálogo e matricule-se em um curso para começar.</p><a href="/treinamentos" class="btn btn-primary btn-sm">Ver Cursos</a></div>';
+                } else {
+                    myGrid.innerHTML = myCourses.map(c => `
+                        <div class="my-course-card glass-card" onclick="openCourse('${c.id}')">
+                            <div class="my-course-thumb"><i class="${getCourseIcon(c.categoria)}"></i></div>
+                            <div class="my-course-info">
+                                <span class="course-category">${c.categoria || 'Geral'}</span>
+                                <h3>${c.titulo}</h3>
+                                <div class="progress-bar-wrapper">
+                                    <div class="progress-bar"><div class="progress-fill" style="width:${c.progresso}%"></div></div>
+                                    <span>${parseFloat(c.progresso).toFixed(0)}%</span>
+                                </div>
+                            </div>
+                            <div class="my-course-action"><i class="fas fa-play"></i></div>
+                        </div>
+                    `).join('');
+                }
+
+                // Available courses (not enrolled)
+                const enrolledIds = myCourses.map(c => c.id);
+                const available = allCourses.filter(c => !enrolledIds.includes(c.id));
+                const availGrid = document.getElementById('available-courses');
+                if (available.length === 0) {
+                    availGrid.innerHTML = '<p style="text-align:center;color:var(--text-secondary);grid-column:1/-1;">Você já está matriculado em todos os cursos!</p>';
+                } else {
+                    availGrid.innerHTML = available.map(c => `
+                        <div class="course-card glass-card">
+                            <div class="course-thumb"><div class="course-thumb-placeholder"><i class="${getCourseIcon(c.categoria)}"></i></div><span class="course-badge-level">${c.nivel}</span></div>
+                            <div class="course-info">
+                                <span class="course-category">${c.categoria || 'Geral'}</span>
+                                <h3>${c.titulo}</h3>
+                                <p>${c.descricao_curta || ''}</p>
+                                <div class="course-meta"><span><i class="fas fa-clock"></i> ${c.duracao || 'N/A'}</span></div>
+                                <div class="course-footer">
+                                    <span class="course-price">${c.preco > 0 ? 'R$ ' + parseFloat(c.preco).toFixed(2) : 'Gratuito'}</span>
+                                    <button class="btn btn-primary btn-sm" onclick="enrollCourse('${c.id}')">Matricular</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function enrollCourse(courseId) {
+            try {
+                await fetch('/api/courses/' + courseId + '/enroll', { method: 'POST', headers: authHeaders() });
+                loadDashboard();
+            } catch (err) { alert('Erro ao matricular'); }
+        }
+
+        async function openCourse(courseId) {
+            currentCourseId = courseId;
+            document.getElementById('dashboard-view').style.display = 'none';
+            document.getElementById('player-view').style.display = 'block';
+            window.scrollTo(0, 0);
+
+            try {
+                const [courseRes, progressRes] = await Promise.all([
+                    fetch('/api/courses/' + courseId),
+                    fetch('/api/courses/' + courseId + '/progress', { headers: authHeaders() })
+                ]);
+                const course = await courseRes.json();
+                const progress = await progressRes.json();
+                completedLessons = progress.completedLessons || [];
+
+                document.getElementById('player-course-title').textContent = course.titulo;
+                document.getElementById('progress-fill').style.width = progress.progresso + '%';
+                document.getElementById('progress-text').textContent = parseFloat(progress.progresso).toFixed(0) + '%';
+
+                // Render modules and lessons
+                const modulesList = document.getElementById('modules-list');
+                modulesList.innerHTML = (course.modules || []).map(mod => `
+                    <div class="module-item">
+                        <div class="module-header"><i class="fas fa-folder"></i> ${mod.titulo}</div>
+                        <div class="lessons-list">
+                            ${(mod.lessons || []).map(les => `
+                                <div class="lesson-item ${completedLessons.includes(les.id) ? 'completed' : ''}" onclick="playLesson('${les.id}')">
+                                    <div class="lesson-status">${completedLessons.includes(les.id) ? '<i class="fas fa-check-circle"></i>' : '<i class="far fa-circle"></i>'}</div>
+                                    <div class="lesson-text">
+                                        <span class="lesson-name">${les.titulo}</span>
+                                        <span class="lesson-duration">${les.duracao || ''}</span>
+                                    </div>
+                                    ${les.gratuita ? '<span class="lesson-free-badge">Grátis</span>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+                // Auto-play first uncompleted lesson
+                const allLessons = course.modules.flatMap(m => m.lessons);
+                const firstUncompleted = allLessons.find(l => !completedLessons.includes(l.id));
+                if (firstUncompleted) playLesson(firstUncompleted.id);
+                else if (allLessons.length > 0) playLesson(allLessons[0].id);
+            } catch (err) { console.error(err); }
+        }
+
+        async function playLesson(lessonId) {
+            currentLessonId = lessonId;
+            try {
+                const res = await fetch('/api/lessons/' + lessonId, { headers: authHeaders() });
+                if (!res.ok) { alert('Matricule-se no curso para acessar esta aula'); return; }
+                const lesson = await res.json();
+
+                document.getElementById('lesson-title').textContent = lesson.titulo;
+                document.getElementById('lesson-desc').textContent = lesson.descricao || '';
+                document.getElementById('complete-btn').style.display = completedLessons.includes(lessonId) ? 'none' : 'inline-flex';
+
+                const videoContainer = document.getElementById('video-container');
+                if (lesson.video_url && lesson.video_url.includes('youtube')) {
+                    videoContainer.innerHTML = `<iframe src="${lesson.video_url}" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`;
+                } else if (lesson.video_url) {
+                    videoContainer.innerHTML = `<video controls src="${lesson.video_url}"></video>`;
+                } else {
+                    videoContainer.innerHTML = '<div class="video-placeholder"><i class="fas fa-video-slash"></i><p>Vídeo em breve</p></div>';
+                }
+
+                // Highlight current lesson
+                document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
+                // Find and activate
+                document.querySelectorAll('.lesson-item').forEach(el => {
+                    if (el.getAttribute('onclick')?.includes(lessonId)) el.classList.add('active');
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        async function completeLesson() {
+            if (!currentLessonId) return;
+            try {
+                await fetch('/api/lessons/' + currentLessonId + '/complete', { method: 'POST', headers: authHeaders() });
+                completedLessons.push(currentLessonId);
+                document.getElementById('complete-btn').style.display = 'none';
+                // Refresh progress
+                openCourse(currentCourseId);
+            } catch (err) { console.error(err); }
+        }
+
+        function showDashboard() {
+            document.getElementById('player-view').style.display = 'none';
+            document.getElementById('dashboard-view').style.display = 'block';
+            loadDashboard();
+        }
+
+        function getCourseIcon(cat) {
+            const icons = { 'Business Intelligence': 'fas fa-chart-bar', 'Dados & Analytics': 'fas fa-database', 'Produtividade': 'fas fa-table', 'Programação': 'fab fa-python' };
+            return icons[cat] || 'fas fa-graduation-cap';
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

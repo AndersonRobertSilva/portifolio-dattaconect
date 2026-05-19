@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treinamentos - Datta Conect</title>
+    <meta name="description" content="Treinamentos especializados em Business Intelligence, Power BI, SQL e análise de dados. Área de membros exclusiva.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+<body>
+    <header id="header">
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">Datta<span>Conect</span></a>
+            <nav class="desktop-nav">
+                <ul>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/sobre">Sobre nós</a></li>
+                    <li><a href="/projetos">Projetos</a></li>
+                    <li><a href="/laboratorio">Laboratório</a></li>
+                    <li><a href="/treinamentos" class="nav-active">Treinamentos</a></li>
+                </ul>
+            </nav>
+            <a href="https://wa.me/5511969525075" target="_blank" class="btn btn-outline"><i class="fab fa-whatsapp"></i> Fale Conosco</a>
+            <button class="mobile-menu-btn" aria-label="Abrir Menu"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="mobile-menu-overlay"></div>
+    <nav class="mobile-menu">
+        <button class="close-menu-btn"><i class="fas fa-times"></i></button>
+        <ul>
+            <li><a href="/">Início</a></li>
+            <li><a href="/sobre">Sobre nós</a></li>
+            <li><a href="/projetos">Projetos</a></li>
+            <li><a href="/laboratorio">Laboratório</a></li>
+            <li><a href="/treinamentos">Treinamentos</a></li>
+            <li><a href="https://wa.me/5511969525075" class="btn btn-primary" target="_blank">Fale Conosco</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="page-hero training-hero">
+        <div class="hero-bg-glow"></div>
+        <div class="container">
+            <div class="badge reveal-up">Área de Membros</div>
+            <h1 class="reveal-up">Nossos <span class="gradient-text">Treinamentos</span></h1>
+            <p class="reveal-up" style="transition-delay: 0.1s;">Aprenda com quem faz. Cursos práticos de BI, dados e analytics para transformar sua carreira.</p>
+            <div class="training-hero-btns reveal-up" style="transition-delay: 0.2s;">
+                <a href="/login" class="btn btn-primary" id="hero-login-btn"><i class="fas fa-sign-in-alt"></i> Entrar na Plataforma</a>
+                <a href="/cadastro" class="btn btn-outline"><i class="fas fa-user-plus"></i> Criar Conta Grátis</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="training-stats">
+        <div class="container">
+            <div class="stats-grid reveal-up">
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="stat-number" id="stat-courses">4</div>
+                    <div class="stat-label">Cursos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fas fa-play-circle"></i></div>
+                    <div class="stat-number">125+</div>
+                    <div class="stat-label">Horas de Conteúdo</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Alunos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fas fa-certificate"></i></div>
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Online</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COURSES CATALOG -->
+    <section class="courses-catalog" id="cursos">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2>Catálogo de <span class="gradient-text">Cursos</span></h2>
+                <p>Escolha o treinamento ideal para o seu nível e comece a aprender agora mesmo.</p>
+            </div>
+
+            <div class="courses-filter reveal-up">
+                <button class="filter-btn active" data-filter="todos">Todos</button>
+                <button class="filter-btn" data-filter="Business Intelligence">BI</button>
+                <button class="filter-btn" data-filter="Dados & Analytics">Dados</button>
+                <button class="filter-btn" data-filter="Programação">Programação</button>
+                <button class="filter-btn" data-filter="Produtividade">Produtividade</button>
+            </div>
+
+            <div class="courses-grid" id="courses-grid">
+                <!-- Courses loaded via JS -->
+                <div class="courses-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Carregando cursos...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section class="training-benefits">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <h2>Por que estudar na <span class="gradient-text">Datta Conect</span>?</h2>
+            </div>
+            <div class="benefits-grid">
+                <div class="glass-card benefit-card reveal-up" style="transition-delay: 0.1s;">
+                    <div class="icon-box"><i class="fas fa-laptop-code"></i></div>
+                    <h3>Projetos Práticos</h3>
+                    <p>Cada curso inclui projetos reais para você aplicar o conhecimento imediatamente.</p>
+                </div>
+                <div class="glass-card benefit-card reveal-up" style="transition-delay: 0.2s;">
+                    <div class="icon-box"><i class="fas fa-infinity"></i></div>
+                    <h3>Acesso Vitalício</h3>
+                    <p>Matricule-se uma vez e tenha acesso ao conteúdo para sempre, incluindo atualizações.</p>
+                </div>
+                <div class="glass-card benefit-card reveal-up" style="transition-delay: 0.3s;">
+                    <div class="icon-box"><i class="fas fa-headset"></i></div>
+                    <h3>Suporte Exclusivo</h3>
+                    <p>Tire suas dúvidas diretamente com os instrutores especialistas do mercado.</p>
+                </div>
+                <div class="glass-card benefit-card reveal-up" style="transition-delay: 0.4s;">
+                    <div class="icon-box"><i class="fas fa-certificate"></i></div>
+                    <h3>Certificado</h3>
+                    <p>Receba um certificado de conclusão para valorizar ainda mais seu currículo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="glass-card cta-card reveal-up">
+                <h2>Comece sua jornada em <span class="gradient-text">dados</span> agora</h2>
+                <p>Crie sua conta gratuita e acesse aulas grátis de todos os cursos.</p>
+                <a href="/cadastro" class="btn btn-primary btn-lg"><i class="fas fa-rocket"></i> Criar Conta Grátis</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo">Datta<span>Conect</span></a>
+                <p>Transformando dados complexos em decisões simples, rápidas e seguras para a sua empresa.</p>
+            </div>
+            <div class="footer-links">
+                <h3>Links Rápidos</h3>
+                <ul>
+                    <li><a href="/sobre">Sobre nós</a></li>
+                    <li><a href="/projetos">Projetos Realizados</a></li>
+                    <li><a href="/laboratorio">Laboratório</a></li>
+                    <li><a href="/treinamentos">Treinamentos</a></li>
+                    <li><a href="/privacidade">Política de Privacidade</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h3>Contato</h3>
+                <p><i class="fas fa-envelope"></i> contato@dattaconect.com.br</p>
+                <p><i class="fab fa-whatsapp"></i> (11) 96952-5075</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Datta Conect. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Load courses from API
+        async function loadCourses() {
+            const grid = document.getElementById('courses-grid');
+            try {
+                const res = await fetch('/api/courses');
+                const courses = await res.json();
+                if (!courses.length) {
+                    grid.innerHTML = '<p style="text-align:center;color:var(--text-secondary);grid-column:1/-1;">Nenhum curso disponível no momento.</p>';
+                    return;
+                }
+                grid.innerHTML = courses.map(c => `
+                    <div class="course-card glass-card reveal-up" data-category="${c.categoria || ''}">
+                        <div class="course-thumb">
+                            <div class="course-thumb-placeholder">
+                                <i class="${getCourseIcon(c.categoria)}"></i>
+                            </div>
+                            ${c.destaque ? '<span class="course-badge-featured">Destaque</span>' : ''}
+                            <span class="course-badge-level">${c.nivel}</span>
+                        </div>
+                        <div class="course-info">
+                            <span class="course-category">${c.categoria || 'Geral'}</span>
+                            <h3>${c.titulo}</h3>
+                            <p>${c.descricao_curta || ''}</p>
+                            <div class="course-meta">
+                                <span><i class="fas fa-clock"></i> ${c.duracao || 'N/A'}</span>
+                                <span><i class="fas fa-signal"></i> ${c.nivel}</span>
+                            </div>
+                            <div class="course-footer">
+                                <span class="course-price">${c.preco > 0 ? 'R$ ' + parseFloat(c.preco).toFixed(2) : 'Gratuito'}</span>
+                                <a href="/login" class="btn btn-primary btn-sm" onclick="checkAuthAndEnroll('${c.id}')">Acessar Curso</a>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                // Re-trigger scroll reveal for dynamically loaded cards
+                document.querySelectorAll('.course-card.reveal-up').forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top <= window.innerHeight) el.classList.add('active');
+                });
+            } catch (err) {
+                grid.innerHTML = courses_fallback();
+            }
+        }
+
+        function courses_fallback() {
+            const courses = [
+                { titulo: 'Power BI do Zero ao Avançado', cat: 'Business Intelligence', nivel: 'Iniciante', duracao: '40 horas', desc: 'Domine o Power BI com projetos práticos.', icon: 'fas fa-chart-bar' },
+                { titulo: 'SQL para Análise de Dados', cat: 'Dados & Analytics', nivel: 'Intermediário', duracao: '30 horas', desc: 'Extraia insights com SQL.', icon: 'fas fa-database' },
+                { titulo: 'Dashboard com Google Sheets', cat: 'Produtividade', nivel: 'Iniciante', duracao: '20 horas', desc: 'Dashboards interativos no Google Sheets.', icon: 'fas fa-table' },
+                { titulo: 'Python para Automação', cat: 'Programação', nivel: 'Avançado', duracao: '35 horas', desc: 'Automatize dados com Python.', icon: 'fab fa-python' }
+            ];
+            return courses.map(c => `
+                <div class="course-card glass-card" data-category="${c.cat}">
+                    <div class="course-thumb"><div class="course-thumb-placeholder"><i class="${c.icon}"></i></div><span class="course-badge-level">${c.nivel}</span></div>
+                    <div class="course-info">
+                        <span class="course-category">${c.cat}</span>
+                        <h3>${c.titulo}</h3>
+                        <p>${c.desc}</p>
+                        <div class="course-meta"><span><i class="fas fa-clock"></i> ${c.duracao}</span><span><i class="fas fa-signal"></i> ${c.nivel}</span></div>
+                        <div class="course-footer"><span class="course-price">Gratuito</span><a href="/login" class="btn btn-primary btn-sm">Acessar</a></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCourseIcon(cat) {
+            const icons = { 'Business Intelligence': 'fas fa-chart-bar', 'Dados & Analytics': 'fas fa-database', 'Produtividade': 'fas fa-table', 'Programação': 'fab fa-python' };
+            return icons[cat] || 'fas fa-graduation-cap';
+        }
+
+        function checkAuthAndEnroll(courseId) {
+            const token = localStorage.getItem('datta_token');
+            if (token) { window.location.href = '/membros'; return false; }
+        }
+
+        // Filter buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCourses();
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const filter = btn.dataset.filter;
+                    document.querySelectorAll('.course-card').forEach(card => {
+                        card.style.display = (filter === 'todos' || card.dataset.category === filter) ? '' : 'none';
+                    });
+                });
+            });
+            // If logged in, change hero button
+            const token = localStorage.getItem('datta_token');
+            if (token) {
+                const heroBtn = document.getElementById('hero-login-btn');
+                if (heroBtn) { heroBtn.href = '/membros'; heroBtn.innerHTML = '<i class="fas fa-th-large"></i> Minha Área'; }
+            }
+        });
+    </script>
+</body>
+</html>

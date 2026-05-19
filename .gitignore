@@ -1,3 +1,7 @@
 whatsapp-bot/
 site.zip
 .vscode/
+node_modules/
+backend/node_modules/
+.env
+*.log
