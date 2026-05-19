@@ -6,18 +6,140 @@ const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'dattaconect_secret_key_2026';
 
-// Database connection
+// Database connection - supports both connection string and individual vars
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgresql://datta:datta123@db:5432/dattaconect'
+    connectionString: process.env.DATABASE_URL || undefined,
+    host: process.env.DB_HOST || process.env.PGHOST || 'db',
+    port: parseInt(process.env.DB_PORT || process.env.PGPORT || '5432'),
+    database: process.env.DB_NAME || process.env.PGDATABASE || 'dattaconect',
+    user: process.env.DB_USER || process.env.PGUSER || 'datta',
+    password: process.env.DB_PASSWORD || process.env.PGPASSWORD || 'datta123',
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
 });
+
+// Auto-initialize database on startup
+async function initDatabase() {
+    const maxRetries = 10;
+    for (let i = 1; i <= maxRetries; i++) {
+        try {
+            await pool.query('SELECT 1');
+            console.log('✅ Conexão com banco de dados estabelecida');
+            break;
+        } catch (err) {
+            console.log(`⏳ Tentativa ${i}/${maxRetries} - Aguardando banco de dados...`);
+            if (i === maxRetries) {
+                console.error('❌ Não foi possível conectar ao banco de dados');
+                process.exit(1);
+            }
+            await new Promise(r => setTimeout(r, 3000));
+        }
+    }
+
+    // Check if tables exist, if not run init
+    try {
+        const tableCheck = await pool.query("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users')");
+        if (!tableCheck.rows[0].exists) {
+            console.log('🔧 Inicializando banco de dados...');
+            const initPath = path.join(__dirname, '..', 'database', 'init.sql');
+            if (fs.existsSync(initPath)) {
+                const sql = fs.readFileSync(initPath, 'utf8');
+                await pool.query(sql);
+                console.log('✅ Banco de dados inicializado com sucesso');
+            } else {
+                // Inline init if file not found (production Docker)
+                await runInlineInit();
+            }
+            // Generate proper admin password hash
+            const adminHash = await bcrypt.hash('admin123', 10);
+            await pool.query('UPDATE users SET senha_hash = $1 WHERE email = $2', [adminHash, 'admin@dattaconect.com.br']);
+            console.log('✅ Senha admin atualizada com hash bcrypt válido');
+        } else {
+            console.log('✅ Tabelas já existem no banco');
+        }
+    } catch (err) {
+        console.error('❌ Erro ao inicializar banco:', err.message);
+    }
+}
+
+async function runInlineInit() {
+    await pool.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            nome VARCHAR(150) NOT NULL, email VARCHAR(255) UNIQUE NOT NULL,
+            senha_hash VARCHAR(255) NOT NULL, role VARCHAR(20) DEFAULT 'aluno',
+            avatar_url TEXT, ativo BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS courses (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            titulo VARCHAR(255) NOT NULL, descricao TEXT, descricao_curta VARCHAR(300),
+            thumbnail_url TEXT, nivel VARCHAR(30) DEFAULT 'Iniciante', duracao VARCHAR(50),
+            categoria VARCHAR(100), preco DECIMAL(10,2) DEFAULT 0.00,
+            ativo BOOLEAN DEFAULT TRUE, destaque BOOLEAN DEFAULT FALSE, ordem INT DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS modules (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+            titulo VARCHAR(255) NOT NULL, descricao TEXT, ordem INT DEFAULT 0,
+            ativo BOOLEAN DEFAULT TRUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS lessons (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            module_id UUID NOT NULL REFERENCES modules(id) ON DELETE CASCADE,
+            titulo VARCHAR(255) NOT NULL, descricao TEXT, video_url TEXT,
+            duracao VARCHAR(20), ordem INT DEFAULT 0, gratuita BOOLEAN DEFAULT FALSE,
+            ativo BOOLEAN DEFAULT TRUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS user_courses (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+            progresso DECIMAL(5,2) DEFAULT 0.00, data_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            data_conclusao TIMESTAMP, UNIQUE(user_id, course_id)
+        );
+        CREATE TABLE IF NOT EXISTS user_lessons (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            lesson_id UUID NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+            concluido BOOLEAN DEFAULT FALSE, data_conclusao TIMESTAMP, UNIQUE(user_id, lesson_id)
+        );
+    `);
+    // Admin seed
+    const adminHash = await bcrypt.hash('admin123', 10);
+    await pool.query(`INSERT INTO users (nome, email, senha_hash, role) VALUES ($1, $2, $3, 'admin') ON CONFLICT (email) DO NOTHING`, ['Administrador', 'admin@dattaconect.com.br', adminHash]);
+    // Courses seed
+    await pool.query(`INSERT INTO courses (id, titulo, descricao, descricao_curta, nivel, duracao, categoria, destaque, ordem) VALUES
+        ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Power BI do Zero ao Avançado', 'Aprenda a criar dashboards profissionais com Power BI.', 'Domine o Power BI com projetos práticos.', 'Iniciante', '40 horas', 'Business Intelligence', TRUE, 1),
+        ('b2c3d4e5-f6a7-8901-bcde-f12345678901', 'SQL para Análise de Dados', 'Domine SQL do básico ao avançado.', 'Extraia insights com SQL.', 'Intermediário', '30 horas', 'Dados & Analytics', TRUE, 2),
+        ('c3d4e5f6-a7b8-9012-cdef-123456789012', 'Dashboard com Google Sheets', 'Dashboards interativos no Google Sheets.', 'Dashboards no Google Sheets.', 'Iniciante', '20 horas', 'Produtividade', FALSE, 3),
+        ('d4e5f6a7-b8c9-0123-defa-234567890123', 'Python para Automação', 'Automatize dados com Python e Pandas.', 'Automatize dados com Python.', 'Avançado', '35 horas', 'Programação', TRUE, 4)
+    ON CONFLICT DO NOTHING`);
+    // Modules seed
+    await pool.query(`INSERT INTO modules (id, course_id, titulo, descricao, ordem) VALUES
+        ('m1000001-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Introdução ao Power BI', 'Primeiros passos', 1),
+        ('m1000002-0000-0000-0000-000000000002', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Fontes de Dados', 'Importação e transformação', 2),
+        ('m2000001-0000-0000-0000-000000000001', 'b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Fundamentos do SQL', 'SELECT, WHERE, ORDER BY', 1)
+    ON CONFLICT DO NOTHING`);
+    // Lessons seed
+    await pool.query(`INSERT INTO lessons (id, module_id, titulo, descricao, video_url, duracao, ordem, gratuita) VALUES
+        ('l1000001-0000-0000-0000-000000000001', 'm1000001-0000-0000-0000-000000000001', 'Bem-vindo ao Curso', 'Apresentação', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '10 min', 1, TRUE),
+        ('l1000002-0000-0000-0000-000000000002', 'm1000001-0000-0000-0000-000000000001', 'Instalando o Power BI', 'Download e configuração', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '15 min', 2, TRUE),
+        ('l2000001-0000-0000-0000-000000000001', 'm2000001-0000-0000-0000-000000000001', 'O que é SQL?', 'Introdução à linguagem', 'https://www.youtube.com/embed/dQw4w9WgXcQ', '12 min', 1, TRUE)
+    ON CONFLICT DO NOTHING`);
+    console.log('✅ Banco inicializado com dados inline');
+}
 
 app.use(cors());
 app.use(express.json());
+
 
 // ============================================
 // MIDDLEWARE: Auth
@@ -347,4 +469,8 @@ app.get('/api/admin/stats', authMiddleware, adminMiddleware, async (req, res) =>
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
-app.listen(PORT, () => console.log(`API rodando na porta ${PORT}`));
+// Start server after DB init
+initDatabase().then(() => {
+    app.listen(PORT, () => console.log(`🚀 API rodando na porta ${PORT}`));
+});
+
