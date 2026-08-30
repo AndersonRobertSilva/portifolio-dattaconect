@@ -79,3 +79,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** garantir que usuários cadastrados pelo site tenham somente acesso de aluno.
 
 **Resultado:** API passou a gravar explicitamente todo cadastro público como `aluno`, sem permissões; promoção para administrador ficou restrita ao painel protegido por `manage_users`.
+
+## 2026-08-30 — Interrupção do vídeo ao sair do estudo
+
+**Solicitação:** impedir que o vídeo continue executando quando o aluno sair do ambiente de estudo ou acessar o catálogo.
+
+**Resultado:** mídias HTML e iframes passaram a ser pausados e descarregados ao voltar ao dashboard, trocar de curso, clicar em links de navegação ou sair da página.

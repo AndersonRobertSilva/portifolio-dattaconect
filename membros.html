@@ -200,6 +200,7 @@
         }
 
         async function openCourse(courseId) {
+            stopMediaPlayback();
             currentCourseId = courseId;
             document.getElementById('dashboard-view').style.display = 'none';
             document.getElementById('player-view').style.display = 'block';
@@ -287,10 +288,38 @@
         }
 
         function showDashboard() {
+            stopMediaPlayback();
             document.getElementById('player-view').style.display = 'none';
             document.getElementById('dashboard-view').style.display = 'block';
             loadDashboard();
         }
+
+        function stopMediaPlayback() {
+            const videoContainer = document.getElementById('video-container');
+            if (!videoContainer) return;
+
+            videoContainer.querySelectorAll('video, audio').forEach(media => {
+                media.pause();
+                media.removeAttribute('src');
+                media.load();
+            });
+
+            videoContainer.querySelectorAll('iframe').forEach(frame => {
+                frame.src = 'about:blank';
+                frame.remove();
+            });
+
+            videoContainer.innerHTML = '<div class="video-placeholder"><i class="fas fa-play-circle"></i><p>Selecione uma aula para começar</p></div>';
+            currentLessonId = null;
+        }
+
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', event => {
+                const href = link.getAttribute('href') || '';
+                if (!href.startsWith('#')) stopMediaPlayback();
+            });
+        });
+        window.addEventListener('pagehide', stopMediaPlayback);
 
         function getCourseIcon(cat) {
             const icons = { 'Business Intelligence': 'fas fa-chart-bar', 'Dados & Analytics': 'fas fa-database', 'Produtividade': 'fas fa-table', 'Programação': 'fab fa-python' };

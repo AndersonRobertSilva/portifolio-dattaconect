@@ -34,6 +34,7 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 18. Implementada gestão completa de perfis: criação de alunos/admins, edição, permissões, pausa/reativação, reset de senha e exclusão protegida.
 19. Criadas permissões granulares `manage_courses` e `manage_users`, verificadas no backend e migradas automaticamente para administradores existentes.
 20. Reforçada a política de cadastro público: novos usuários são gravados explicitamente como `aluno`, com permissões vazias; promoção exige um administrador com `manage_users`.
+21. Corrigida reprodução em segundo plano: vídeos, áudios e iframes são interrompidos ao sair do player, trocar de curso ou navegar para Catálogo/Site.
 
 ## Decisões conhecidas
 
