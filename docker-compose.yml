@@ -31,6 +31,9 @@ services:
     restart: always
     depends_on:
       - api
+    environment:
+      API_HOST: api
+      API_PORT: 3001
     ports:
       - "80:80"
 

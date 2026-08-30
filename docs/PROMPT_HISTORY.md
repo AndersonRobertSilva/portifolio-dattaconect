@@ -13,3 +13,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** adicionar o arquivo `AGENTS.md` para manter o histórico das solicitações e orientar a continuidade.
 
 **Resultado:** criado `AGENTS.md` na raiz com ordem de leitura, regras de atualização e segurança; criado este histórico resumido de prompts; README e histórico de continuidade atualizados.
+
+## 2026-08-30 — Correção do deploy do frontend
+
+**Solicitação:** corrigir o deploy que encerrava o Nginx com `host not found in upstream \"n8n_dattaconect-api\"`.
+
+**Resultado:** removido o hostname inválido fixo; o frontend passou a receber `API_HOST` e `API_PORT`, com padrão `api:3001`, e a resolver o serviço dinamicamente pelo DNS interno do Docker.

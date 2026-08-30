@@ -24,6 +24,7 @@ Encerre sem apagar o banco com `docker compose down`. Não use `down -v` salvo q
 - Configurar segredos no provedor, nunca no Git.
 - Confirmar backup recente do banco.
 - Confirmar o host de `proxy_pass` na rede do ambiente.
+- No frontend, configurar `API_HOST` com o nome interno do serviço da API e `API_PORT` com sua porta. No Compose os valores são `api` e `3001`.
 - Verificar logs após a implantação.
 
 ## Segurança obrigatória
@@ -55,6 +56,7 @@ Teste a restauração em ambiente isolado e não versione dumps com dados pessoa
 ## Diagnóstico rápido
 
 - Site abre, API falha: confira proxy, rede Docker, API e PostgreSQL.
+- Log mostra `host not found in upstream`: confira `API_HOST`; o Nginx usa DNS interno do Docker e não deve receber nomes de outro projeto/serviço.
 - API reinicia: confira logs e variáveis; há dez tentativas de conexão.
 - Login falha: confira usuário ativo, hash, relógio e `JWT_SECRET`.
 - Página volta à home: confira o HTML e `try_files`.

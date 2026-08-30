@@ -56,6 +56,8 @@ O Compose define `frontend`, `api` e `db`, além do volume persistente `pgdata`.
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Conexão em campos separados |
 | `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` | Nomes PostgreSQL equivalentes |
 | `DB_SSL` | `true` quando o provedor exigir TLS |
+| `API_HOST` | Host interno da API usado pelo Nginx; padrão `api` |
+| `API_PORT` | Porta interna da API usada pelo Nginx; padrão `3001` |
 
 ## Limites atuais
 

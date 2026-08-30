@@ -20,6 +20,7 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 4. Registrados riscos e próximos passos abaixo.
 5. Criado `AGENTS.md` com instruções permanentes de continuidade.
 6. Criado `docs/PROMPT_HISTORY.md` para preservar um resumo cronológico das solicitações do projeto.
+7. Corrigida a falha de deploy causada pelo upstream inexistente `n8n_dattaconect-api`: o proxy passou a usar `API_HOST`/`API_PORT`, resolução dinâmica do DNS Docker e padrão `api:3001` compatível com o Compose.
 
 ## Decisões conhecidas
 
@@ -36,7 +37,7 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 - **Alto:** `cors()` aceita qualquer origem; restringir aos domínios oficiais.
 - **Alto:** endpoints de autenticação não têm rate limit, confirmação de e-mail nem recuperação de senha.
 - **Alto:** não há testes automatizados nem pipeline CI visível.
-- **Médio:** `nginx.conf` aponta para `n8n_dattaconect-api`, enquanto o Compose nomeia o serviço `api`; alinhar por ambiente.
+- **Resolvido:** o endereço do upstream do Nginx agora é configurável por ambiente e usa `api:3001` no Compose.
 - **Médio:** o `Dockerfile` do frontend copia todo o contexto; criar `.dockerignore`.
 - **Médio:** existem sinais de codificação incorreta no backend, banco e manual; padronizar UTF-8.
 - **Médio:** scripts das páginas autenticadas são inline e duplicados; modularizar.
