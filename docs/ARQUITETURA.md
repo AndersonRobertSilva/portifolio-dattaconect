@@ -32,9 +32,11 @@ Navegador
 - Componentes compartilhados para navegação, botões, cards, prova social, etapas, métricas e chamadas comerciais.
 - Breakpoints principais em 960 px e 768 px, com suporte a `prefers-reduced-motion`.
 
-### Servidor web
+### Contêiner da aplicação
 
-- Nginx serve os arquivos estáticos.
+- O `Dockerfile` principal empacota Nginx e API Node no mesmo contêiner para eliminar dependência de DNS entre serviços no Easypanel.
+- Supervisor mantém os dois processos ativos e envia os logs para a saída do contêiner.
+- Nginx serve apenas HTML, CSS, JavaScript e assets; backend e documentação não ficam na raiz pública.
 - `try_files` transforma `/sobre` em `sobre.html` e mantém fallback para `index.html`.
 - Requisições `/api/` são encaminhadas à API Express.
 
@@ -52,7 +54,7 @@ Navegador
 
 ## Implantação
 
-O Compose define `frontend`, `api` e `db`, além do volume persistente `pgdata`. O manual informa que o Easypanel observa o GitHub e reconstrói o deploy após push.
+O Compose define a aplicação integrada (`frontend`) e o PostgreSQL (`db`), além do volume persistente `pgdata`. Em produção, o banco pode ser um serviço PostgreSQL separado, conectado por `DATABASE_URL`.
 
 ## Configuração
 
@@ -64,8 +66,10 @@ O Compose define `frontend`, `api` e `db`, além do volume persistente `pgdata`.
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Conexão em campos separados |
 | `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` | Nomes PostgreSQL equivalentes |
 | `DB_SSL` | `true` quando o provedor exigir TLS |
-| `API_HOST` | Host interno da API usado pelo Nginx; padrão `api` |
+| `API_HOST` | Host interno da API usado pelo Nginx; padrão `127.0.0.1` |
 | `API_PORT` | Porta interna da API usada pelo Nginx; padrão `3001` |
+| `ADMIN_EMAIL` | E-mail da conta administrativa sincronizada no início |
+| `ADMIN_PASSWORD` | Senha administrativa; mínimo de 12 caracteres em produção |
 
 ## Limites atuais
 

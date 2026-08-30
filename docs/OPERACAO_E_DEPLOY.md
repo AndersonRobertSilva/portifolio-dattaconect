@@ -12,7 +12,7 @@ Verificações:
 curl http://localhost/
 curl http://localhost/api/health
 docker compose ps
-docker compose logs api
+docker compose logs frontend
 ```
 
 Encerre sem apagar o banco com `docker compose down`. Não use `down -v` salvo quando houver intenção explícita de apagar o volume PostgreSQL.
@@ -23,13 +23,28 @@ Encerre sem apagar o banco com `docker compose down`. Não use `down -v` salvo q
 - Testar health check e os fluxos afetados.
 - Configurar segredos no provedor, nunca no Git.
 - Confirmar backup recente do banco.
-- Confirmar o host de `proxy_pass` na rede do ambiente.
-- No frontend, configurar `API_HOST` com o nome interno do serviço da API e `API_PORT` com sua porta. No Compose os valores são `api` e `3001`.
+- Confirmar que Nginx e API iniciaram nos logs do mesmo serviço.
 - Verificar logs após a implantação.
 
 ## Segurança obrigatória
 
 Configure `JWT_SECRET` longo e aleatório, credenciais exclusivas do PostgreSQL e nova senha administrativa. Restrinja CORS ao domínio real, habilite HTTPS e aplique rate limiting em login/cadastro. Os valores do Compose são apenas para desenvolvimento; os fallbacks da API também precisam ser removidos antes de dados reais.
+
+## Variáveis obrigatórias no Easypanel
+
+O serviço construído pelo `Dockerfile` da raiz já contém site e API. Configure nele:
+
+```text
+DATABASE_URL=postgresql://USUARIO:SENHA@HOST:5432/BANCO
+JWT_SECRET=um-segredo-longo-aleatorio-e-exclusivo
+ADMIN_EMAIL=email-do-administrador
+ADMIN_PASSWORD=senha-forte-com-no-minimo-12-caracteres
+DB_SSL=true
+```
+
+Use `DB_SSL=false` apenas se o PostgreSQL interno não exigir TLS. A aplicação sincroniza a conta indicada por `ADMIN_EMAIL` em cada inicialização.
+
+Depois do deploy, valide `/api/health`, entre em `/login` com as variáveis administrativas e confirme o redirecionamento para `/admin`. No painel, cadastre primeiro o curso, depois seus módulos e aulas.
 
 ## Publicação pelo GitHub
 
@@ -56,7 +71,7 @@ Teste a restauração em ambiente isolado e não versione dumps com dados pessoa
 ## Diagnóstico rápido
 
 - Site abre, API falha: confira proxy, rede Docker, API e PostgreSQL.
-- Log mostra `host not found in upstream`: confira `API_HOST`; o Nginx usa DNS interno do Docker e não deve receber nomes de outro projeto/serviço.
+- Log mostra `host not found in upstream`: confirme que `API_HOST` não foi sobrescrito; no deploy integrado ele deve ser `127.0.0.1`.
 - API reinicia: confira logs e variáveis; há dez tentativas de conexão.
 - Login falha: confira usuário ativo, hash, relógio e `JWT_SECRET`.
 - Página volta à home: confira o HTML e `try_files`.

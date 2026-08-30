@@ -43,3 +43,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** liberar acesso para verificar a estrutura da área de membros enquanto a plataforma real está indisponível.
 
 **Resultado:** criada rota pública `/demo-membros` com dashboard, catálogo e player preenchidos por dados fictícios; adicionado acesso pela tela de login sem contornar a autenticação real.
+
+## 2026-08-30 — Painel administrativo em produção
+
+**Solicitação:** disponibilizar o ambiente real para cadastrar e publicar cursos, não apenas a demonstração.
+
+**Resultado:** site e API consolidados no mesmo contêiner para remover a falha de comunicação interna; acesso administrativo passou a ser provisionado por variáveis protegidas. O PostgreSQL continua exigindo uma `DATABASE_URL` válida no Easypanel.

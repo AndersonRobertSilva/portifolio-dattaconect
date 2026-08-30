@@ -11,6 +11,8 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'dattaconect_secret_key_2026';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // Database connection - supports both connection string and individual vars
 const pool = new Pool({
@@ -55,16 +57,35 @@ async function initDatabase() {
                 // Inline init if file not found (production Docker)
                 await runInlineInit();
             }
-            // Generate proper admin password hash
-            const adminHash = await bcrypt.hash('admin123', 10);
-            await pool.query('UPDATE users SET senha_hash = $1 WHERE email = $2', [adminHash, 'admin@dattaconect.com.br']);
-            console.log('✅ Senha admin atualizada com hash bcrypt válido');
         } else {
             console.log('✅ Tabelas já existem no banco');
         }
+        await ensureProductionAdmin();
     } catch (err) {
         console.error('❌ Erro ao inicializar banco:', err.message);
     }
+}
+
+async function ensureProductionAdmin() {
+    if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+        console.warn('⚠️ ADMIN_EMAIL e ADMIN_PASSWORD não configurados; conta administrativa não será sincronizada');
+        return;
+    }
+    if (process.env.NODE_ENV === 'production' && ADMIN_PASSWORD.length < 12) {
+        console.warn('⚠️ ADMIN_PASSWORD deve ter pelo menos 12 caracteres em produção');
+        return;
+    }
+    const adminHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+    await pool.query(`
+        INSERT INTO users (nome, email, senha_hash, role, ativo)
+        VALUES ($1, $2, $3, 'admin', TRUE)
+        ON CONFLICT (email) DO UPDATE SET
+            senha_hash = EXCLUDED.senha_hash,
+            role = 'admin',
+            ativo = TRUE,
+            updated_at = CURRENT_TIMESTAMP
+    `, ['Administrador', ADMIN_EMAIL, adminHash]);
+    console.log('✅ Conta administrativa sincronizada');
 }
 
 async function runInlineInit() {
