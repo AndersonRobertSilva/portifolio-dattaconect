@@ -25,3 +25,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** analisar o projeto e ajustar o site para ter apresentação profissional, moderna, clara e comparável à de grandes startups.
 
 **Resultado:** home reposicionada com narrativa executiva e foco em conversão; novo sistema visual responsivo aplicado a todas as páginas; componentes, navegação, acessibilidade e feedback de indisponibilidade da plataforma refinados sem alterar os contratos da API.
+
+## 2026-08-30 — Legibilidade da prova social
+
+**Solicitação:** melhorar a faixa de empresas atendidas para destacar texto e marcas de forma legível.
+
+**Resultado:** faixa recebeu painel com contraste, hierarquia tipográfica mais clara e logotipos em cards claros com comportamento responsivo.
