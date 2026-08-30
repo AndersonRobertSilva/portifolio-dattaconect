@@ -61,3 +61,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** corrigir página 404 do Nginx ao acessar `/treinamentos` após o deploy integrado.
 
 **Resultado:** confirmado que Easypanel não ativou o template do Nginx; configuração passou a ser instalada diretamente em `conf.d`, restaurando resolução de `.html` e proxy local da API.
+
+## 2026-08-30 — Retorno ao painel administrativo
+
+**Solicitação:** permitir que o administrador retorne ao dashboard de gestão após acessar a área do aluno.
+
+**Resultado:** incluído link condicional “Painel Admin” nos menus desktop e mobile da área de membros, exibido somente quando `role` é `admin`.

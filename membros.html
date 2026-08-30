@@ -20,6 +20,7 @@
             <a href="/" class="logo">Datta<span>Conect</span></a>
             <nav class="desktop-nav">
                 <ul>
+                    <li id="admin-nav-item" hidden><a href="/admin"><i class="fas fa-gauge-high"></i> Painel Admin</a></li>
                     <li><a href="/treinamentos">Catálogo</a></li>
                     <li><a href="/membros" class="nav-active">Meus Cursos</a></li>
                 </ul>
@@ -36,6 +37,7 @@
     <nav class="mobile-menu">
         <button class="close-menu-btn"><i class="fas fa-times"></i></button>
         <ul>
+            <li id="admin-mobile-nav-item" hidden><a href="/admin"><i class="fas fa-gauge-high"></i> Painel Admin</a></li>
             <li><a href="/treinamentos">Catálogo</a></li>
             <li><a href="/membros">Meus Cursos</a></li>
             <li><a href="#" onclick="logout()">Sair</a></li>
@@ -109,7 +111,8 @@
         const user = JSON.parse(localStorage.getItem('datta_user') || '{}');
         if (!token) window.location.href = '/login';
         if (user.role === 'admin') {
-            // Admin can also access members area
+            document.getElementById('admin-nav-item').hidden = false;
+            document.getElementById('admin-mobile-nav-item').hidden = false;
         }
 
         // Set user name

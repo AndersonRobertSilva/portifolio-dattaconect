@@ -30,6 +30,7 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 14. Adicionadas `ADMIN_EMAIL` e `ADMIN_PASSWORD` para provisionar e sincronizar o acesso ao painel de cursos.
 15. Corrigido conflito `EADDRINUSE`: o Easypanel injeta `PORT=80`, mas o processo da API agora recebe explicitamente `PORT=3001` pelo Supervisor.
 16. Corrigido 404 nas URLs amigáveis: o `nginx.conf` agora é instalado diretamente em `conf.d`, sem depender do entrypoint/template que o Easypanel não executou.
+17. Adicionado retorno ao painel administrativo nos menus desktop e mobile da área do aluno, visível exclusivamente para usuários com papel `admin`.
 
 ## Decisões conhecidas
 
