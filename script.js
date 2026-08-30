@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.getElementById('header');
     
     window.addEventListener('scroll', () => {
+        if (!header) return;
         if (window.scrollY > 50) {
             header.classList.add('scrolled');
         } else {
@@ -25,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function toggleMenu() {
         mobileMenu.classList.toggle('active');
         mobileOverlay.classList.toggle('active');
+        const isOpen = mobileMenu.classList.contains('active');
+        mobileMenuBtn?.setAttribute('aria-expanded', String(isOpen));
         // Prevent scrolling on body when menu is open
         document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
     }
@@ -37,6 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Close menu when a link is clicked
         mobileLinks.forEach(link => {
             link.addEventListener('click', toggleMenu);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && mobileMenu.classList.contains('active')) toggleMenu();
         });
     }
 
@@ -78,3 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
 
 });
+
+/**
+ * Lê respostas da API sem expor erros técnicos de parsing ao usuário.
+ * Respostas HTML normalmente indicam proxy ou backend indisponível.
+ */
+window.readApiResponse = async function (response) {
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+        throw new Error('A plataforma de treinamentos está temporariamente indisponível. Tente novamente em alguns minutos.');
+    }
+    return response.json();
+};

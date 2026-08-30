@@ -10,13 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=1.1">
+    <link rel="stylesheet" href="modern.css?v=2.0">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
     <header id="header">
         <div class="container nav-wrapper">
             <a href="/" class="logo">Datta<span>Conect</span></a>
-            <nav class="desktop-nav">
+            <nav class="desktop-nav" aria-label="Navegação principal">
                 <ul>
                     <li><a href="/">Início</a></li>
                     <li><a href="/sobre">Sobre nós</a></li>
@@ -26,13 +27,13 @@
                 </ul>
             </nav>
             <a href="https://wa.me/5511969525075" target="_blank" class="btn btn-outline"><i class="fab fa-whatsapp"></i> Fale Conosco</a>
-            <button class="mobile-menu-btn" aria-label="Abrir Menu"><i class="fas fa-bars"></i></button>
+            <button type="button" class="mobile-menu-btn" aria-label="Abrir Menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
         </div>
     </header>
 
     <div class="mobile-menu-overlay"></div>
-    <nav class="mobile-menu">
-        <button class="close-menu-btn"><i class="fas fa-times"></i></button>
+    <nav class="mobile-menu" aria-label="Navegação móvel">
+        <button type="button" class="close-menu-btn" aria-label="Fechar menu"><i class="fas fa-times"></i></button>
         <ul>
             <li><a href="/">Início</a></li>
             <li><a href="/sobre">Sobre nós</a></li>
@@ -56,19 +57,19 @@
                 <form id="register-form" class="auth-form">
                     <div class="form-group">
                         <label for="nome"><i class="fas fa-user"></i> Nome completo</label>
-                        <input type="text" id="nome" placeholder="Seu nome completo" required>
+                        <input type="text" id="nome" placeholder="Seu nome completo" autocomplete="name" required>
                     </div>
                     <div class="form-group">
                         <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="email" placeholder="seu@email.com" required>
+                        <input type="email" id="email" placeholder="seu@email.com" autocomplete="email" required>
                     </div>
                     <div class="form-group">
                         <label for="senha"><i class="fas fa-key"></i> Senha</label>
-                        <input type="password" id="senha" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <input type="password" id="senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required minlength="6">
                     </div>
                     <div class="form-group">
                         <label for="senha2"><i class="fas fa-key"></i> Confirmar Senha</label>
-                        <input type="password" id="senha2" placeholder="Repita a senha" required minlength="6">
+                        <input type="password" id="senha2" placeholder="Repita a senha" autocomplete="new-password" required minlength="6">
                     </div>
 
                     <div id="register-error" class="auth-error" style="display:none;"></div>
@@ -118,7 +119,7 @@
                         senha
                     })
                 });
-                const data = await res.json();
+                const data = await window.readApiResponse(res);
                 if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
                 localStorage.setItem('datta_token', data.token);
                 localStorage.setItem('datta_user', JSON.stringify(data.user));

@@ -21,6 +21,8 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 5. Criado `AGENTS.md` com instruções permanentes de continuidade.
 6. Criado `docs/PROMPT_HISTORY.md` para preservar um resumo cronológico das solicitações do projeto.
 7. Corrigida a falha de deploy causada pelo upstream inexistente `n8n_dattaconect-api`: o proxy passou a usar `API_HOST`/`API_PORT`, resolução dinâmica do DNS Docker e padrão `api:3001` compatível com o Compose.
+8. Reformulada a experiência institucional: nova home orientada a proposta de valor, prova social, soluções, método, integrações e conversão; criado `modern.css` e aplicado às dez páginas para consistência visual e responsiva.
+9. Melhoradas acessibilidade do menu móvel e mensagem de indisponibilidade da API em login/cadastro.
 
 ## Decisões conhecidas
 

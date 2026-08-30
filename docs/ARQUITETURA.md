@@ -20,9 +20,17 @@ Navegador
 
 - HTML multipágina, sem framework ou etapa de build.
 - `style.css` concentra os estilos compartilhados.
+- `modern.css` aplica o sistema visual institucional atual e sobrescreve progressivamente os estilos legados sem romper as telas funcionais.
 - `script.js` controla menu móvel, animações e comportamentos gerais.
 - Páginas da plataforma incluem lógica própria inline.
 - Fontes Google e Font Awesome são dependências externas do navegador.
+
+### Sistema visual
+
+- Direção dark premium com azul profundo, índigo e verde como cores de ação e confirmação.
+- Tipografia `Space Grotesk` em títulos e `Inter` em textos e controles.
+- Componentes compartilhados para navegação, botões, cards, prova social, etapas, métricas e chamadas comerciais.
+- Breakpoints principais em 960 px e 768 px, com suporte a `prefers-reduced-motion`.
 
 ### Servidor web
 

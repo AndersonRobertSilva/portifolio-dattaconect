@@ -1,263 +1,88 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datta Conect - Dashboards Estratégicos | Inteligência de Dados</title>
-    <meta name="description" content="Transforme dados complexos em decisões simples, rápidas e seguras. Dashboards personalizados para gestão de vendas, finanças e operações.">
-    <meta name="keywords" content="Business Intelligence, Dashboards, BI, Gestão Estratégica, Análise de Dados, Omie, Power BI">
-    <meta name="author" content="Datta Conect">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.dattaconect.com.br/">
-    <meta property="og:title" content="Datta Conect - Dashboards Estratégicos">
-    <meta property="og:description" content="Decisões rápidas e seguras para gestores através de inteligência de dados.">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datta Conect | Dados que movem negócios</title>
+    <meta name="description" content="Estratégia de dados, dashboards e automação para empresas que precisam decidir com velocidade e segurança.">
+    <meta name="theme-color" content="#07111f">
+    <meta property="og:type" content="website"><meta property="og:url" content="https://www.dattaconect.com.br/">
+    <meta property="og:title" content="Datta Conect | Dados que movem negócios"><meta property="og:description" content="Transformamos dados dispersos em clareza operacional e decisões melhores.">
     <meta property="og:image" content="https://www.dattaconect.com.br/assets/dashboard.png">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2.0"><link rel="stylesheet" href="modern.css?v=2.0">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
-
-    <!-- NAVBAR -->
-    <header id="header">
-        <div class="container nav-wrapper">
-            <a href="#" class="logo">
-                Datta<span>Conect</span>
-            </a>
-            
-            <nav class="desktop-nav">
-                <ul>
-                    <li><a href="/">Início</a></li>
-                    <li><a href="/sobre">Sobre nós</a></li>
-                    <li><a href="/projetos">Projetos</a></li>
-                    <li><a href="/laboratorio">Laboratório</a></li>
-                    <li><a href="/treinamentos">Treinamentos</a></li>
-                </ul>
-            </nav>
-
-            <a href="https://wa.me/5511969525075" target="_blank" class="btn btn-outline">
-                <i class="fab fa-whatsapp"></i> Fale Conosco
-            </a>
-
-            <button class="mobile-menu-btn" aria-label="Abrir Menu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- MOBILE MENU -->
+    <header id="header"><div class="container nav-wrapper">
+        <a href="/" class="logo" aria-label="Datta Conect — início">Datta<span>Conect</span></a>
+        <nav class="desktop-nav" aria-label="Navegação principal"><ul>
+            <li><a href="/" class="nav-active">Início</a></li><li><a href="/sobre">Sobre</a></li><li><a href="/projetos">Projetos</a></li><li><a href="/laboratorio">Laboratório</a></li><li><a href="/treinamentos">Academy</a></li>
+        </ul></nav>
+        <a href="https://wa.me/5511969525075?text=Olá%2C%20quero%20entender%20como%20a%20Datta%20Conect%20pode%20ajudar%20minha%20empresa." target="_blank" rel="noopener" class="btn btn-outline">Fale com um especialista <i class="fas fa-arrow-up-right-from-square"></i></a>
+        <button type="button" class="mobile-menu-btn" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+    </div></header>
     <div class="mobile-menu-overlay"></div>
-    <nav class="mobile-menu">
-        <button class="close-menu-btn"><i class="fas fa-times"></i></button>
-        <ul>
-            <li><a href="/">Início</a></li>
-            <li><a href="/sobre">Sobre nós</a></li>
-            <li><a href="/projetos">Projetos</a></li>
-            <li><a href="/laboratorio">Laboratório</a></li>
-            <li><a href="/treinamentos">Treinamentos</a></li>
-            <li><a href="https://wa.me/5511969525075" class="btn btn-primary" target="_blank">Fale Conosco</a></li>
-        </ul>
-    </nav>
+    <nav class="mobile-menu" aria-label="Navegação móvel"><button type="button" class="close-menu-btn" aria-label="Fechar menu"><i class="fas fa-times"></i></button><ul>
+        <li><a href="/">Início</a></li><li><a href="/sobre">Sobre</a></li><li><a href="/projetos">Projetos</a></li><li><a href="/laboratorio">Laboratório</a></li><li><a href="/treinamentos">Academy</a></li><li><a href="https://wa.me/5511969525075" class="btn btn-primary" target="_blank" rel="noopener">Conversar agora</a></li>
+    </ul></nav>
 
-    <!-- HERO SECTION -->
-    <section id="inicio" class="hero">
-        <div class="hero-bg-glow"></div>
-        <div class="container hero-container">
+    <main>
+        <section class="hero" id="inicio"><div class="hero-bg-glow"></div><div class="container hero-container">
             <div class="hero-content reveal-left">
-                <div class="badge">Inovação em Gestão</div>
-                <h1>Decisões rápidas e <span class="gradient-text">seguras</span> para gestores.</h1>
-                <p>Nossos dashboards personalizados organizam dados de diferentes fontes em uma visão única, facilitando o acompanhamento de indicadores, performance de vendas, operações e finanças.</p>
-                <div class="hero-buttons">
-                    <a href="#solucoes" class="btn btn-primary">Conhecer Soluções</a>
-                    <a href="https://wa.me/5511969525075" target="_blank" class="btn btn-secondary">
-                        <i class="fab fa-whatsapp"></i> Falar com Especialista
-                    </a>
-                </div>
+                <span class="eyebrow">Data intelligence studio</span>
+                <h1>Seus dados.<br><span class="gradient-text">Uma direção clara.</span></h1>
+                <p>Conectamos sistemas, automatizamos análises e criamos visões executivas que ajudam empresas ambiciosas a operar melhor e decidir mais rápido.</p>
+                <div class="hero-buttons"><a href="https://wa.me/5511969525075?text=Olá%2C%20quero%20agendar%20um%20diagnóstico%20de%20dados." target="_blank" rel="noopener" class="btn btn-primary btn-lg">Agendar diagnóstico <i class="fas fa-arrow-right"></i></a><a href="/projetos" class="btn btn-secondary btn-lg">Explorar projetos</a></div>
+                <div class="hero-proof"><span><i class="fas fa-circle-check"></i> Diagnóstico consultivo</span><span><i class="fas fa-circle-check"></i> Solução sob medida</span><span><i class="fas fa-circle-check"></i> Acompanhamento próximo</span></div>
             </div>
-            <div class="hero-image reveal-right">
-                <div class="glass-card image-wrapper">
-                    <img src="assets/dashboard.png" alt="Exemplo de Dashboard Estratégico Datta Conect" />
-                    <div class="floating-badge badge-1"><i class="fas fa-chart-line"></i> +45% Receita</div>
-                    <div class="floating-badge badge-2"><i class="fas fa-bolt"></i> Decisão em tempo real</div>
-                </div>
-            </div>
-        </div>
-    </section>
+            <div class="hero-image reveal-right"><div class="image-wrapper">
+                <img src="assets/dashboard.png" alt="Dashboard executivo criado pela Datta Conect" width="760" height="520">
+                <div class="floating-badge badge-1"><i class="fas fa-chart-line"></i> Indicadores em tempo real</div><div class="floating-badge badge-2"><i class="fas fa-bolt"></i> Operação conectada</div>
+            </div></div>
+        </div></section>
 
-    <!-- CLIENTS SECTION -->
-    <section class="clients-section">
-        <div class="container">
-            <div class="section-header reveal-up">
-                <h2>Empresas que <span class="gradient-text">confiam</span> em nosso trabalho</h2>
-            </div>
-            
-            <div class="clients-grid">
-                <div class="client-item reveal-up"><img src="assets/logos/b2w-digital.svg" alt="Logo B2W Digital" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/synapcom.svg" alt="Logo Synapcom" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/cta-hub.svg" alt="Logo CTA Hub" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/marcos-paulo.svg" alt="Logo Marcos Paulo" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/space-edu.svg" alt="Logo Space Edu" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/moreway.svg" alt="Logo MoreWay Fitness" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/a-c-camargo-cancer-center.svg" alt="Logo A.C Camargo Cancer Center" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/infracommerce.svg" alt="Logo Infra Commerce" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/febracis.svg" alt="Logo Febracis" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/ibs-ideal-business-school.svg" alt="Logo IBS" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/plx-digital.svg" alt="Logo PLX Digital" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/jobhome.svg" alt="Logo JobHome" class="client-logo"></div>
-                <div class="client-item reveal-up"><img src="assets/logos/jm_distribuicao.svg" alt="Logo JM Distribuição" class="client-logo"></div>
-            </div>
-        </div>
-    </section>
+        <section class="trust-strip" aria-label="Empresas atendidas"><div class="container trust-shell">
+            <p class="trust-copy"><strong>Experiência que atravessa setores</strong> Projetos e operações conectadas a grandes marcas.</p>
+            <div class="trust-logos"><img src="assets/logos/b2w-digital.svg" alt="B2W Digital"><img src="assets/logos/infracommerce.svg" alt="Infracommerce"><img src="assets/logos/a-c-camargo-cancer-center.svg" alt="A.C. Camargo"><img src="assets/logos/synapcom.svg" alt="Synapcom"><img src="assets/logos/febracis.svg" alt="Febracis"><img src="assets/logos/jm_distribuicao.svg" alt="JM Distribuição"></div>
+        </div></section>
 
-    <!-- DESAFIOS SECTION -->
-    <section id="desafios" class="desafios">
-        <div class="container">
-            <div class="section-header reveal-up">
-                <h2>Os <span class="gradient-text">desafios</span> que resolvemos</h2>
-                <p>A maioria das empresas enfrenta dificuldades crônicas com dados. Você se identifica com alguma destas dores?</p>
+        <section class="outcomes-section" id="resultados"><div class="container">
+            <div class="section-header reveal-up"><p class="section-kicker">Do dado ao resultado</p><h2>Clareza para cada decisão que move o negócio.</h2><p>Estruturamos a informação certa para liderança, times comerciais, finanças e operações trabalharem na mesma direção.</p></div>
+            <div class="outcome-grid">
+                <article class="outcome-card reveal-up"><span class="card-index">01 — VISIBILIDADE</span><h3>Uma versão confiável da operação</h3><p>Centralize indicadores dispersos e acompanhe o desempenho sem depender de consolidações manuais.</p></article>
+                <article class="outcome-card reveal-up"><span class="card-index">02 — VELOCIDADE</span><h3>Menos relatório, mais ação</h3><p>Automatize rotinas repetitivas e devolva tempo ao time para analisar, priorizar e executar.</p></article>
+                <article class="outcome-card reveal-up"><span class="card-index">03 — CONTROLE</span><h3>Gestão orientada por evidências</h3><p>Transforme métricas em sinais claros para antecipar riscos, capturar oportunidades e corrigir rotas.</p></article>
             </div>
-            
-            <div class="cards-grid">
-                <div class="glass-card feature-card reveal-up" style="transition-delay: 0.1s;">
-                    <div class="icon-box red"><i class="fas fa-file-excel"></i></div>
-                    <h3>Planilhas Espalhadas</h3>
-                    <p>Dados descentralizados em múltiplas planilhas e sistemas diferentes, gerando confusão e perda de dados.</p>
-                </div>
-                
-                <div class="glass-card feature-card reveal-up" style="transition-delay: 0.2s;">
-                    <div class="icon-box red"><i class="fas fa-eye-slash"></i></div>
-                    <h3>Falta de Clareza</h3>
-                    <p>Visão embaçada sobre os resultados reais do negócio, impossibilitando ajustes de rota precisos.</p>
-                </div>
-                
-                <div class="glass-card feature-card reveal-up" style="transition-delay: 0.3s;">
-                    <div class="icon-box red"><i class="fas fa-brain"></i></div>
-                    <h3>Decisões no "Achismo"</h3>
-                    <p>Falta de métricas sólidas, forçando decisões baseadas puramente na intuição do gestor.</p>
-                </div>
-                
-                <div class="glass-card feature-card reveal-up" style="transition-delay: 0.4s;">
-                    <div class="icon-box red"><i class="fas fa-hourglass-half"></i></div>
-                    <h3>Perda de Tempo</h3>
-                    <p>Horas gastas na criação de relatórios manuais que já estão desatualizados quando ficam prontos.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        </div></section>
 
-    <!-- SOLUÇÕES SECTION -->
-    <section id="solucoes" class="solucoes">
-        <div class="container">
-            <div class="solucoes-wrapper">
-                <div class="solucoes-text reveal-left">
-                    <h2>Nossas <span class="gradient-text">Soluções</span></h2>
-                    <p>Com dashboards de Business Intelligence, transformamos seus dados brutos em informações organizadas, visuais e acionáveis.</p>
-                    
-                    <ul class="check-list">
-                        <li><i class="fas fa-check-circle"></i> Dashboards personalizados para gestores</li>
-                        <li><i class="fas fa-check-circle"></i> Indicadores estratégicos de negócio (KPIs)</li>
-                        <li><i class="fas fa-check-circle"></i> Integração de múltiplas bases de dados</li>
-                        <li><i class="fas fa-check-circle"></i> Automação completa de relatórios</li>
-                        <li><i class="fas fa-check-circle"></i> Visão clara para acompanhamento de resultados</li>
-                    </ul>
-                    
-                    <a href="https://portifolio.dattaconect.com.br/projetos-realizado" class="btn btn-primary" style="margin-top: 2rem;">Conheça nossos projetos</a>
-                </div>
-                <div class="solucoes-image reveal-right">
-                    <div class="integration-grid">
-                        <div class="tool-card"><i class="fas fa-database"></i><span>SQL</span></div>
-                        <div class="tool-card"><i class="fab fa-microsoft"></i><span>Power BI</span></div>
-                        <div class="tool-card"><i class="fas fa-chart-pie"></i><span>Analytics</span></div>
-                        <div class="tool-card"><i class="fas fa-cloud"></i><span>Cloud</span></div>
-                    </div>
-                </div>
+        <section class="services-section" id="solucoes"><div class="container services-layout">
+            <div class="services-intro reveal-left"><p class="section-kicker">O que construímos</p><h2>Tecnologia aplicada aos desafios reais da gestão.</h2><p>Da organização da base ao painel executivo, entregamos soluções que respeitam a maturidade e a rotina de cada empresa.</p><a href="/projetos" class="btn btn-outline section-action">Conhecer entregas <i class="fas fa-arrow-right"></i></a></div>
+            <div class="service-list reveal-right">
+                <article class="service-row"><i class="fas fa-chart-simple"></i><div><h3>Dashboards executivos</h3><p>KPIs comerciais, financeiros e operacionais em experiências claras, rápidas e responsivas.</p></div><span class="arrow">↗</span></article>
+                <article class="service-row"><i class="fas fa-diagram-project"></i><div><h3>Integração de dados</h3><p>Conexão entre ERPs, CRMs, planilhas, bancos e APIs para eliminar silos de informação.</p></div><span class="arrow">↗</span></article>
+                <article class="service-row"><i class="fas fa-gears"></i><div><h3>Automação de processos</h3><p>Fluxos mais eficientes, menos trabalho manual e informação disponível quando o time precisa.</p></div><span class="arrow">↗</span></article>
+                <article class="service-row"><i class="fas fa-compass"></i><div><h3>Estratégia e governança</h3><p>Definição de métricas, arquitetura e rituais para transformar dados em prática de gestão.</p></div><span class="arrow">↗</span></article>
             </div>
-        </div>
-    </section>
+        </div></section>
 
-    <!-- INTEGRATIONS SECTION -->
-    <section id="integracoes" class="integrations-section">
-        <div class="container">
-            <div class="section-header reveal-up">
-                <h2>Integrações <span class="gradient-text">Realizadas</span></h2>
-            </div>
-            
-            <div class="integrations-grid">
-                <div class="integration-item reveal-up"><img src="assets/logos/omie.svg" alt="Integração Omie" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/avaya.svg" alt="Integração Avaya" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/google-drive.svg" alt="Integração Google Drive" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/clickup.svg" alt="Integração ClickUp" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/mysql.svg" alt="Integração MySQL" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/meta.svg" alt="Integração Meta" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/salesforce.svg" alt="Integração Salesforce" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/excel.svg" alt="Integração Microsoft Excel" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/webhook.svg" alt="Integração Webhook" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/pipedrive.svg" alt="Integração Pipedrive" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/notion.svg" alt="Integração Notion" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/google-sheets.svg" alt="Integração Google Sheets" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/postgresql.svg" alt="Integração PostgreSQL" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/google-analytics.svg" alt="Integração Google Analytics" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/glpi.svg" alt="Integração GLPI" class="integration-logo"></div>
-                <div class="integration-item reveal-up"><img src="assets/logos/github.svg" alt="Integração GitHub" class="integration-logo"></div>
-            </div>
-        </div>
-    </section>
+        <section class="process-section"><div class="container">
+            <div class="section-header reveal-up"><p class="section-kicker">Método Datta</p><h2>Da pergunta certa à solução em produção.</h2><p>Um processo simples, transparente e colaborativo para reduzir risco e acelerar valor.</p></div>
+            <div class="process-grid reveal-up"><article class="process-step"><span>ETAPA 01</span><h3>Descobrir</h3><p>Entendemos o negócio, as decisões críticas e as fontes disponíveis.</p></article><article class="process-step"><span>ETAPA 02</span><h3>Desenhar</h3><p>Priorizamos indicadores e prototipamos a experiência ideal para cada perfil.</p></article><article class="process-step"><span>ETAPA 03</span><h3>Conectar</h3><p>Tratamos, integramos e automatizamos os dados com segurança.</p></article><article class="process-step"><span>ETAPA 04</span><h3>Evoluir</h3><p>Publicamos, acompanhamos a adoção e refinamos com o uso real.</p></article></div>
+        </div></section>
 
-    <!-- CTA SECTION -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="glass-card cta-card reveal-up">
-                <h2>Pronto para assumir o <span class="gradient-text">controle</span>?</h2>
-                <p>Clique abaixo e entenda como aplicar inteligência de dados no seu negócio hoje mesmo.</p>
-                <a href="https://wa.me/5511969525075" target="_blank" class="btn btn-primary btn-lg">
-                    <i class="fab fa-whatsapp"></i> Falar no WhatsApp
-                </a>
-            </div>
-        </div>
-    </section>
+        <section class="metrics-band"><div class="container metrics-shell reveal-up"><div class="metrics-copy"><h3>Capacidade de ponta a ponta</h3><p>Estratégia, engenharia e experiência trabalhando como uma só equipe.</p></div><div class="metric"><strong>16+</strong><span>integrações dominadas</span></div><div class="metric"><strong>4</strong><span>frentes de solução</span></div><div class="metric"><strong>1</strong><span>parceiro do diagnóstico à evolução</span></div></div></section>
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="container footer-content">
-            <div class="footer-brand">
-                <a href="#" class="logo">Datta<span>Conect</span></a>
-                <p>Transformando dados complexos em decisões simples, rápidas e seguras para a sua empresa.</p>
-            </div>
-            
-            <div class="footer-links">
-                <h3>Links Rápidos</h3>
-                <ul>
-                    <li><a href="/sobre">Sobre nós</a></li>
-                    <li><a href="/projetos">Projetos Realizados</a></li>
-                    <li><a href="/laboratorio">Laboratório</a></li>
-                    <li><a href="/treinamentos">Treinamentos</a></li>
-                    <li><a href="/privacidade">Política de Privacidade</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-contact">
-                <h3>Contato</h3>
-                <p><i class="fas fa-envelope"></i> contato@dattaconect.com.br</p>
-                <p><i class="fab fa-whatsapp"></i> (11) 96952-5075</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Datta Conect. Todos os direitos reservados.</p>
-        </div>
-    </footer>
+        <section class="integrations-section" id="integracoes"><div class="container">
+            <div class="section-header reveal-up"><p class="section-kicker">Ecossistema conectado</p><h2>Trabalhamos com as ferramentas que já fazem parte da sua operação.</h2></div>
+            <div class="integrations-marquee reveal-up"><span class="integration-chip"><img src="assets/logos/omie.svg" alt="">Omie</span><span class="integration-chip"><img src="assets/logos/salesforce.svg" alt="">Salesforce</span><span class="integration-chip"><img src="assets/logos/pipedrive.svg" alt="">Pipedrive</span><span class="integration-chip"><img src="assets/logos/postgresql.svg" alt="">PostgreSQL</span><span class="integration-chip"><img src="assets/logos/mysql.svg" alt="">MySQL</span><span class="integration-chip"><img src="assets/logos/google-sheets.svg" alt="">Google Sheets</span><span class="integration-chip"><img src="assets/logos/clickup.svg" alt="">ClickUp</span><span class="integration-chip"><img src="assets/logos/meta.svg" alt="">Meta</span><span class="integration-chip"><img src="assets/logos/google-analytics.svg" alt="">Analytics</span><span class="integration-chip"><img src="assets/logos/webhook.svg" alt="">Webhooks</span></div>
+        </div></section>
 
-    <!-- Custom JS -->
-    <script src="script.js"></script>
+        <section class="cta-section"><div class="container"><div class="cta-card reveal-up"><p class="section-kicker section-kicker-light">Próximo passo</p><h2>O que seus dados poderiam responder hoje?</h2><p>Em uma conversa objetiva, mapeamos o cenário atual e identificamos onde existe mais valor para capturar.</p><a href="https://wa.me/5511969525075?text=Olá%2C%20quero%20agendar%20um%20diagnóstico%20de%20dados." target="_blank" rel="noopener" class="btn btn-lg">Agendar uma conversa <i class="fas fa-arrow-right"></i></a></div></div></section>
+    </main>
+
+    <footer><div class="container footer-content"><div class="footer-brand"><a href="/" class="logo">Datta<span>Conect</span></a><p>Estratégia, tecnologia e dados para empresas que querem operar com clareza.</p></div><div class="footer-links"><h3>Explore</h3><ul><li><a href="/sobre">Sobre</a></li><li><a href="/projetos">Projetos</a></li><li><a href="/laboratorio">Laboratório</a></li><li><a href="/treinamentos">Academy</a></li><li><a href="/privacidade">Privacidade</a></li></ul></div><div class="footer-contact"><h3>Vamos conversar</h3><p><i class="fas fa-envelope"></i> contato@dattaconect.com.br</p><p><i class="fab fa-whatsapp"></i> (11) 96952-5075</p></div></div><div class="footer-bottom"><p>&copy; 2026 Datta Conect. Todos os direitos reservados.</p></div></footer>
+    <script src="script.js?v=2.0"></script>
 </body>
 </html>

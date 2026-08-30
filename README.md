@@ -34,6 +34,7 @@ database/           esquema e dados iniciais PostgreSQL
 docs/               documentação viva do projeto
 *.html              páginas do site e da plataforma
 style.css           estilos compartilhados
+modern.css          sistema visual e refinamentos da interface
 script.js           interações compartilhadas
 nginx.conf          site estático e proxy /api
 docker-compose.yml  ambiente local completo

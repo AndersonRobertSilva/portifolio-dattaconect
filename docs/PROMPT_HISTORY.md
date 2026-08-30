@@ -19,3 +19,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** corrigir o deploy que encerrava o Nginx com `host not found in upstream \"n8n_dattaconect-api\"`.
 
 **Resultado:** removido o hostname inválido fixo; o frontend passou a receber `API_HOST` e `API_PORT`, com padrão `api:3001`, e a resolver o serviço dinamicamente pelo DNS interno do Docker.
+
+## 2026-08-30 — Reformulação institucional
+
+**Solicitação:** analisar o projeto e ajustar o site para ter apresentação profissional, moderna, clara e comparável à de grandes startups.
+
+**Resultado:** home reposicionada com narrativa executiva e foco em conversão; novo sistema visual responsivo aplicado a todas as páginas; componentes, navegação, acessibilidade e feedback de indisponibilidade da plataforma refinados sem alterar os contratos da API.
