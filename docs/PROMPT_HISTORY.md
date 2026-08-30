@@ -49,3 +49,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** disponibilizar o ambiente real para cadastrar e publicar cursos, não apenas a demonstração.
 
 **Resultado:** site e API consolidados no mesmo contêiner para remover a falha de comunicação interna; acesso administrativo passou a ser provisionado por variáveis protegidas. O PostgreSQL continua exigindo uma `DATABASE_URL` válida no Easypanel.
+
+## 2026-08-30 — Conflito de porta no deploy
+
+**Solicitação:** analisar o resultado do deploy integrado.
+
+**Resultado:** confirmado que PostgreSQL e inicialização do esquema funcionaram; corrigido conflito entre Nginx e API na porta 80, fixando a porta interna da API em 3001 pelo Supervisor. Identificada também senha administrativa abaixo do mínimo exigido.

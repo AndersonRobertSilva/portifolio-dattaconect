@@ -28,6 +28,7 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 12. Criado `/demo-membros`, ambiente público com dados fictícios para revisar dashboard e player sem depender da API ou liberar autenticação real.
 13. Unificado o deploy de produção: Nginx e API Node agora são executados no mesmo contêiner por Supervisor; o PostgreSQL permanece persistente e configurado por `DATABASE_URL`.
 14. Adicionadas `ADMIN_EMAIL` e `ADMIN_PASSWORD` para provisionar e sincronizar o acesso ao painel de cursos.
+15. Corrigido conflito `EADDRINUSE`: o Easypanel injeta `PORT=80`, mas o processo da API agora recebe explicitamente `PORT=3001` pelo Supervisor.
 
 ## Decisões conhecidas
 
