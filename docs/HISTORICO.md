@@ -18,6 +18,8 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 2. Estrutura, páginas, API, banco, Docker e proxy Nginx inventariados.
 3. Criados documentos de arquitetura, mapa, API/dados e operação/deploy.
 4. Registrados riscos e próximos passos abaixo.
+5. Criado `AGENTS.md` com instruções permanentes de continuidade.
+6. Criado `docs/PROMPT_HISTORY.md` para preservar um resumo cronológico das solicitações do projeto.
 
 ## Decisões conhecidas
 

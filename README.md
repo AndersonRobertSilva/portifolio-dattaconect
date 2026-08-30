@@ -4,7 +4,9 @@ Site institucional e plataforma de treinamentos da Datta Conect. O frontend é e
 
 ## Documentação
 
+- [Instruções permanentes para agentes](AGENTS.md)
 - [Histórico e continuidade](docs/HISTORICO.md)
+- [Histórico resumido de solicitações](docs/PROMPT_HISTORY.md)
 - [Arquitetura](docs/ARQUITETURA.md)
 - [Mapa do site](docs/MAPA_DO_SITE.md)
 - [Operação e deploy](docs/OPERACAO_E_DEPLOY.md)
