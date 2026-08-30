@@ -222,7 +222,9 @@ app.post('/api/auth/register', async (req, res) => {
         if (exists.rows.length > 0) return res.status(409).json({ error: 'Email já cadastrado' });
         const senha_hash = await bcrypt.hash(senha, 10);
         const result = await pool.query(
-            'INSERT INTO users (nome, email, senha_hash) VALUES ($1, $2, $3) RETURNING id, nome, email, role, permissions',
+            `INSERT INTO users (nome, email, senha_hash, role, permissions)
+             VALUES ($1, LOWER($2), $3, 'aluno', '[]'::jsonb)
+             RETURNING id, nome, email, role, permissions`,
             [nome, email, senha_hash]
         );
         const user = result.rows[0];

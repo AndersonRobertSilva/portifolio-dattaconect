@@ -46,6 +46,8 @@ courses 1---N modules 1---N lessons
 ## Regras relevantes
 
 - E-mail único; uma matrícula por usuário/curso; um progresso por usuário/aula.
+- Todo cadastro público em `POST /auth/register` é criado obrigatoriamente como `aluno`, sem permissões administrativas; campos de papel enviados pelo cliente são ignorados.
+- A promoção para administrador só pode ocorrer pelo painel/API protegida com `manage_users`.
 - Aulas não gratuitas exigem matrícula, exceto para administradores.
 - Percentual recalculado ao concluir uma aula; JWT expira em sete dias.
 - Administradores podem receber `manage_courses`, `manage_users` ou ambas. As permissões são consultadas no banco a cada ação administrativa.

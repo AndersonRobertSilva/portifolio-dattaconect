@@ -73,3 +73,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** adicionar ações de reset de senha, exclusão, edição e pausa para cada perfil, além de permissões e criação de novos administradores responsáveis pelos cursos.
 
 **Resultado:** adicionada gestão completa de usuários no painel e na API, com permissões separadas para cursos e usuários, migração automática do banco e proteções contra autoexclusão, autopausa e remoção do último administrador.
+
+## 2026-08-30 — Cadastro público somente como aluno
+
+**Solicitação:** garantir que usuários cadastrados pelo site tenham somente acesso de aluno.
+
+**Resultado:** API passou a gravar explicitamente todo cadastro público como `aluno`, sem permissões; promoção para administrador ficou restrita ao painel protegido por `manage_users`.
