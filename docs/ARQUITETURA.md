@@ -66,8 +66,6 @@ O Compose define a aplicação integrada (`frontend`) e o PostgreSQL (`db`), al�
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Conexão em campos separados |
 | `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` | Nomes PostgreSQL equivalentes |
 | `DB_SSL` | `true` quando o provedor exigir TLS |
-| `API_HOST` | Host interno da API usado pelo Nginx; padrão `127.0.0.1` |
-| `API_PORT` | Porta interna da API usada pelo Nginx; padrão `3001` |
 | `ADMIN_EMAIL` | E-mail da conta administrativa sincronizada no início |
 | `ADMIN_PASSWORD` | Senha administrativa; mínimo de 12 caracteres em produção |
 
@@ -75,6 +73,7 @@ O Compose define a aplicação integrada (`frontend`) e o PostgreSQL (`db`), al�
 
 - Autenticação no navegador depende de `localStorage`.
 - API e frontend são acoplados pelo caminho relativo `/api`.
+- O proxy interno é fixo em `127.0.0.1:3001`, pois Nginx e API pertencem ao mesmo contêiner.
 - Não há migrações versionadas; a criação ocorre por SQL inicial ou rotina inline.
 - Observabilidade se limita aos logs e ao endpoint `/api/health`.
 

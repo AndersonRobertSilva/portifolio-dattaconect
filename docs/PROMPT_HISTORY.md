@@ -55,3 +55,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** analisar o resultado do deploy integrado.
 
 **Resultado:** confirmado que PostgreSQL e inicialização do esquema funcionaram; corrigido conflito entre Nginx e API na porta 80, fixando a porta interna da API em 3001 pelo Supervisor. Identificada também senha administrativa abaixo do mínimo exigido.
+
+## 2026-08-30 — URLs amigáveis retornando 404
+
+**Solicitação:** corrigir página 404 do Nginx ao acessar `/treinamentos` após o deploy integrado.
+
+**Resultado:** confirmado que Easypanel não ativou o template do Nginx; configuração passou a ser instalada diretamente em `conf.d`, restaurando resolução de `.html` e proxy local da API.

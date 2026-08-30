@@ -29,6 +29,7 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 13. Unificado o deploy de produção: Nginx e API Node agora são executados no mesmo contêiner por Supervisor; o PostgreSQL permanece persistente e configurado por `DATABASE_URL`.
 14. Adicionadas `ADMIN_EMAIL` e `ADMIN_PASSWORD` para provisionar e sincronizar o acesso ao painel de cursos.
 15. Corrigido conflito `EADDRINUSE`: o Easypanel injeta `PORT=80`, mas o processo da API agora recebe explicitamente `PORT=3001` pelo Supervisor.
+16. Corrigido 404 nas URLs amigáveis: o `nginx.conf` agora é instalado diretamente em `conf.d`, sem depender do entrypoint/template que o Easypanel não executou.
 
 ## Decisões conhecidas
 

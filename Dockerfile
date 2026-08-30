@@ -14,10 +14,8 @@ COPY --from=api-dependencies /app/backend/node_modules ./backend/node_modules
 WORKDIR /usr/share/nginx/html
 COPY *.html *.css *.js ./
 COPY assets/ ./assets/
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY supervisord.conf /etc/supervisord.conf
 ENV NODE_ENV=production
-ENV API_HOST=127.0.0.1
-ENV API_PORT=3001
 EXPOSE 80
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]
