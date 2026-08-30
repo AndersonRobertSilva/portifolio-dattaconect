@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=1.1">
-    <link rel="stylesheet" href="modern.css?v=2.1">
+    <link rel="stylesheet" href="modern.css?v=2.3">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
@@ -70,8 +70,8 @@
 
             <!-- TABS -->
             <div class="admin-tabs reveal-up">
-                <button class="admin-tab active" onclick="showTab('courses')"><i class="fas fa-book"></i> Cursos</button>
-                <button class="admin-tab" onclick="showTab('users')"><i class="fas fa-users"></i> Alunos</button>
+                <button class="admin-tab active" id="courses-tab-button" onclick="showTab('courses')"><i class="fas fa-book"></i> Cursos</button>
+                <button class="admin-tab" id="users-tab-button" onclick="showTab('users')"><i class="fas fa-users"></i> Usuários</button>
             </div>
 
             <!-- COURSES TAB -->
@@ -91,11 +91,12 @@
             <!-- USERS TAB -->
             <div class="admin-content" id="tab-users" style="display:none;">
                 <div class="admin-toolbar">
-                    <h2>Alunos Cadastrados</h2>
+                    <div><h2>Usuários e permissões</h2><p class="admin-toolbar-copy">Gerencie alunos, administradores e acessos da plataforma.</p></div>
+                    <button class="btn btn-primary btn-sm" onclick="showUserModal()"><i class="fas fa-user-plus"></i> Novo usuário</button>
                 </div>
                 <div class="admin-table-wrapper">
                     <table class="admin-table" id="users-table">
-                        <thead><tr><th>Nome</th><th>Email</th><th>Tipo</th><th>Status</th><th>Cadastro</th></tr></thead>
+                        <thead><tr><th>Nome</th><th>Email</th><th>Tipo</th><th>Permissões</th><th>Status</th><th>Cadastro</th><th>Ações</th></tr></thead>
                         <tbody id="users-tbody"></tbody>
                     </table>
                 </div>
@@ -137,6 +138,29 @@
                 </div>
                 <input type="hidden" id="cf-id">
                 <button type="submit" class="btn btn-primary btn-full">Salvar Curso</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: User -->
+    <div class="modal-overlay" id="user-modal" style="display:none;">
+        <div class="modal glass-card">
+            <div class="modal-header"><h3 id="user-modal-title">Novo usuário</h3><button type="button" onclick="closeModal('user-modal')" aria-label="Fechar">&times;</button></div>
+            <form id="user-form" class="auth-form">
+                <input type="hidden" id="uf-id">
+                <div class="form-group"><label for="uf-nome">Nome</label><input type="text" id="uf-nome" required autocomplete="name"></div>
+                <div class="form-group"><label for="uf-email">E-mail</label><input type="email" id="uf-email" required autocomplete="email"></div>
+                <div class="form-row">
+                    <div class="form-group"><label for="uf-role">Tipo de perfil</label><select id="uf-role"><option value="aluno">Aluno</option><option value="admin">Administrador</option></select></div>
+                    <div class="form-group" id="uf-password-group"><label for="uf-senha">Senha inicial</label><input type="password" id="uf-senha" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></div>
+                </div>
+                <fieldset class="permission-fieldset" id="uf-permissions">
+                    <legend>Permissões administrativas</legend>
+                    <label class="permission-option"><input type="checkbox" id="uf-manage-courses" value="manage_courses"><span><strong>Gerenciar cursos</strong><small>Criar e editar cursos, módulos e aulas.</small></span></label>
+                    <label class="permission-option"><input type="checkbox" id="uf-manage-users" value="manage_users"><span><strong>Gerenciar usuários</strong><small>Criar administradores, editar, pausar, redefinir senha e excluir perfis.</small></span></label>
+                </fieldset>
+                <div class="form-feedback" id="user-form-error" hidden></div>
+                <button type="submit" class="btn btn-primary btn-full">Salvar usuário</button>
             </form>
         </div>
     </div>
@@ -184,6 +208,8 @@
         if (!token || user.role !== 'admin') window.location.href = '/login';
 
         let currentCourseId = null;
+        let managedUsers = [];
+        let currentAdminPermissions = user.permissions || [];
 
         function authHeaders() { return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }; }
         function logout() { localStorage.removeItem('datta_token'); localStorage.removeItem('datta_user'); window.location.href = '/login'; }
@@ -409,22 +435,141 @@
         async function loadUsers() {
             try {
                 const res = await fetch('/api/admin/users', { headers: authHeaders() });
-                const users = await res.json();
-                document.getElementById('users-tbody').innerHTML = users.map(u => `
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erro ao carregar usuários');
+                managedUsers = data;
+                document.getElementById('users-tbody').innerHTML = managedUsers.map(u => `
                     <tr>
-                        <td>${u.nome}</td>
-                        <td>${u.email}</td>
+                        <td>${escapeHtml(u.nome)}</td>
+                        <td>${escapeHtml(u.email)}</td>
                         <td><span class="table-badge ${u.role === 'admin' ? 'badge-purple' : ''}">${u.role}</span></td>
+                        <td>${renderPermissions(u)}</td>
                         <td><span class="table-badge ${u.ativo ? 'badge-green' : 'badge-red'}">${u.ativo ? 'Ativo' : 'Inativo'}</span></td>
                         <td>${new Date(u.created_at).toLocaleDateString('pt-BR')}</td>
+                        <td><div class="table-actions user-actions">
+                            <button type="button" class="btn-icon" title="Editar perfil e permissões" aria-label="Editar ${escapeHtml(u.nome)}" onclick="showUserModal('${u.id}')"><i class="fas fa-pen"></i></button>
+                            <button type="button" class="btn-icon" title="Redefinir senha" aria-label="Redefinir senha de ${escapeHtml(u.nome)}" onclick="resetUserPassword('${u.id}')"><i class="fas fa-key"></i></button>
+                            <button type="button" class="btn-icon ${u.ativo ? 'btn-warning' : ''}" title="${u.id === user.id ? 'Você não pode pausar seu próprio perfil' : (u.ativo ? 'Pausar perfil' : 'Reativar perfil')}" aria-label="${u.ativo ? 'Pausar' : 'Reativar'} ${escapeHtml(u.nome)}" onclick="toggleUserStatus('${u.id}', ${!u.ativo})" ${u.id === user.id ? 'disabled' : ''}><i class="fas ${u.ativo ? 'fa-pause' : 'fa-play'}"></i></button>
+                            <button type="button" class="btn-icon btn-danger" title="${u.id === user.id ? 'Você não pode excluir seu próprio perfil' : 'Excluir perfil'}" aria-label="Excluir ${escapeHtml(u.nome)}" onclick="deleteUser('${u.id}')" ${u.id === user.id ? 'disabled' : ''}><i class="fas fa-trash"></i></button>
+                        </div></td>
                     </tr>
                 `).join('');
-            } catch (e) {}
+            } catch (error) {
+                document.getElementById('users-tbody').innerHTML = `<tr><td colspan="7" class="table-message">${escapeHtml(error.message)}</td></tr>`;
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+        }
+
+        function renderPermissions(account) {
+            if (account.role !== 'admin') return '<span class="permission-muted">Acesso de aluno</span>';
+            const labels = { manage_courses: 'Cursos', manage_users: 'Usuários' };
+            const permissions = account.permissions || [];
+            return permissions.length
+                ? `<div class="permission-badges">${permissions.map(item => `<span>${labels[item] || escapeHtml(item)}</span>`).join('')}</div>`
+                : '<span class="permission-muted">Sem permissões</span>';
+        }
+
+        function showUserModal(id = '') {
+            const account = managedUsers.find(item => item.id === id);
+            document.getElementById('user-modal-title').textContent = account ? 'Editar usuário' : 'Novo usuário';
+            document.getElementById('uf-id').value = account?.id || '';
+            document.getElementById('uf-nome').value = account?.nome || '';
+            document.getElementById('uf-email').value = account?.email || '';
+            document.getElementById('uf-role').value = account?.role || 'aluno';
+            document.getElementById('uf-senha').value = '';
+            document.getElementById('uf-senha').required = !account;
+            document.getElementById('uf-password-group').hidden = Boolean(account);
+            document.getElementById('uf-manage-courses').checked = account?.permissions?.includes('manage_courses') || false;
+            document.getElementById('uf-manage-users').checked = account?.permissions?.includes('manage_users') || false;
+            document.getElementById('user-form-error').hidden = true;
+            updatePermissionVisibility();
+            document.getElementById('user-modal').style.display = 'flex';
+        }
+
+        function updatePermissionVisibility() {
+            document.getElementById('uf-permissions').hidden = document.getElementById('uf-role').value !== 'admin';
+        }
+
+        document.getElementById('uf-role').addEventListener('change', updatePermissionVisibility);
+
+        document.getElementById('user-form').addEventListener('submit', async event => {
+            event.preventDefault();
+            const id = document.getElementById('uf-id').value;
+            const permissions = ['manage_courses', 'manage_users'].filter(permission => document.getElementById('uf-' + permission.replace('_', '-')).checked);
+            const body = {
+                nome: document.getElementById('uf-nome').value,
+                email: document.getElementById('uf-email').value,
+                role: document.getElementById('uf-role').value,
+                permissions
+            };
+            if (!id) body.senha = document.getElementById('uf-senha').value;
+            const feedback = document.getElementById('user-form-error');
+            try {
+                await adminRequest(id ? '/api/admin/users/' + id : '/api/admin/users', { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+                closeModal('user-modal');
+                loadUsers();
+                loadStats();
+            } catch (error) {
+                feedback.textContent = error.message;
+                feedback.hidden = false;
+            }
+        });
+
+        async function toggleUserStatus(id, ativo) {
+            const verb = ativo ? 'reativar' : 'pausar';
+            if (!confirm(`Deseja ${verb} este perfil?`)) return;
+            try {
+                await adminRequest('/api/admin/users/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ ativo }) });
+                loadUsers();
+            } catch (error) { alert(error.message); }
+        }
+
+        async function resetUserPassword(id) {
+            const senha = prompt('Informe a nova senha temporária (mínimo de 8 caracteres):');
+            if (senha === null) return;
+            try {
+                await adminRequest('/api/admin/users/' + id + '/reset-password', { method: 'POST', body: JSON.stringify({ senha }) });
+                alert('Senha redefinida com sucesso. Oriente o usuário a alterá-la com segurança.');
+            } catch (error) { alert(error.message); }
+        }
+
+        async function deleteUser(id) {
+            if (!confirm('Excluir permanentemente este perfil e seus dados de progresso? Esta ação não pode ser desfeita.')) return;
+            try {
+                await adminRequest('/api/admin/users/' + id, { method: 'DELETE' });
+                loadUsers();
+                loadStats();
+            } catch (error) { alert(error.message); }
+        }
+
+        async function adminRequest(url, options = {}) {
+            const response = await fetch(url, { ...options, headers: authHeaders() });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Não foi possível concluir a ação');
+            return data;
         }
 
         // Init
-        loadStats();
-        loadCourses();
+        async function initializeAdmin() {
+            try {
+                const me = await adminRequest('/api/auth/me');
+                currentAdminPermissions = me.permissions || [];
+                const canCourses = currentAdminPermissions.includes('manage_courses');
+                const canUsers = currentAdminPermissions.includes('manage_users');
+                document.getElementById('courses-tab-button').hidden = !canCourses;
+                document.getElementById('users-tab-button').hidden = !canUsers;
+                if (!canCourses && canUsers) showTab('users');
+                else if (canCourses) loadCourses();
+                else document.querySelector('.admin-tabs').innerHTML = '<p class="table-message">Este administrador ainda não possui permissões atribuídas.</p>';
+                loadStats();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+        initializeAdmin();
     </script>
 </body>
 </html>

@@ -60,9 +60,24 @@ async function initDatabase() {
         } else {
             console.log('✅ Tabelas já existem no banco');
         }
+        await migrateUserPermissions();
         await ensureProductionAdmin();
     } catch (err) {
         console.error('❌ Erro ao inicializar banco:', err.message);
+    }
+}
+
+async function migrateUserPermissions() {
+    const column = await pool.query(`
+        SELECT EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'users' AND column_name = 'permissions'
+        ) AS exists
+    `);
+    if (!column.rows[0].exists) {
+        await pool.query(`ALTER TABLE users ADD COLUMN permissions JSONB NOT NULL DEFAULT '[]'::jsonb`);
+        await pool.query(`UPDATE users SET permissions = '["manage_courses","manage_users"]'::jsonb WHERE role = 'admin'`);
+        console.log('✅ Permissões administrativas migradas');
     }
 }
 
@@ -77,14 +92,15 @@ async function ensureProductionAdmin() {
     }
     const adminHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
     await pool.query(`
-        INSERT INTO users (nome, email, senha_hash, role, ativo)
-        VALUES ($1, $2, $3, 'admin', TRUE)
+        INSERT INTO users (nome, email, senha_hash, role, permissions, ativo)
+        VALUES ($1, $2, $3, 'admin', $4::jsonb, TRUE)
         ON CONFLICT (email) DO UPDATE SET
             senha_hash = EXCLUDED.senha_hash,
             role = 'admin',
+            permissions = EXCLUDED.permissions,
             ativo = TRUE,
             updated_at = CURRENT_TIMESTAMP
-    `, ['Administrador', ADMIN_EMAIL, adminHash]);
+    `, ['Administrador', ADMIN_EMAIL, adminHash, JSON.stringify(['manage_courses', 'manage_users'])]);
     console.log('✅ Conta administrativa sincronizada');
 }
 
@@ -95,6 +111,7 @@ async function runInlineInit() {
             id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
             nome VARCHAR(150) NOT NULL, email VARCHAR(255) UNIQUE NOT NULL,
             senha_hash VARCHAR(255) NOT NULL, role VARCHAR(20) DEFAULT 'aluno',
+            permissions JSONB NOT NULL DEFAULT '[]'::jsonb,
             avatar_url TEXT, ativo BOOLEAN DEFAULT TRUE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -135,7 +152,7 @@ async function runInlineInit() {
     `);
     // Admin seed
     const adminHash = await bcrypt.hash('admin123', 10);
-    await pool.query(`INSERT INTO users (nome, email, senha_hash, role) VALUES ($1, $2, $3, 'admin') ON CONFLICT (email) DO NOTHING`, ['Administrador', 'admin@dattaconect.com.br', adminHash]);
+    await pool.query(`INSERT INTO users (nome, email, senha_hash, role, permissions) VALUES ($1, $2, $3, 'admin', $4::jsonb) ON CONFLICT (email) DO NOTHING`, ['Administrador', 'admin@dattaconect.com.br', adminHash, JSON.stringify(['manage_courses', 'manage_users'])]);
     // Courses seed
     await pool.query(`INSERT INTO courses (id, titulo, descricao, descricao_curta, nivel, duracao, categoria, destaque, ordem) VALUES
         ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Power BI do Zero ao Avançado', 'Aprenda a criar dashboards profissionais com Power BI.', 'Domine o Power BI com projetos práticos.', 'Iniciante', '40 horas', 'Business Intelligence', TRUE, 1),
@@ -165,11 +182,16 @@ app.use(express.json());
 // ============================================
 // MIDDLEWARE: Auth
 // ============================================
-function authMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Token não fornecido' });
     try {
-        req.user = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const result = await pool.query('SELECT id, role, permissions, ativo FROM users WHERE id = $1', [decoded.id]);
+        const account = result.rows[0];
+        if (!account || !account.ativo) return res.status(401).json({ error: 'Perfil inativo ou não encontrado' });
+        req.account = account;
+        req.user = { ...decoded, role: account.role, permissions: account.permissions || [] };
         next();
     } catch {
         return res.status(401).json({ error: 'Token inválido' });
@@ -177,8 +199,16 @@ function authMiddleware(req, res, next) {
 }
 
 function adminMiddleware(req, res, next) {
-    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Acesso negado' });
+    if (req.account?.role !== 'admin') return res.status(403).json({ error: 'Acesso negado' });
     next();
+}
+
+function requirePermission(permission) {
+    return (req, res, next) => {
+        const permissions = Array.isArray(req.account?.permissions) ? req.account.permissions : [];
+        if (!permissions.includes(permission)) return res.status(403).json({ error: 'Você não possui permissão para esta ação' });
+        next();
+    };
 }
 
 // ============================================
@@ -192,11 +222,11 @@ app.post('/api/auth/register', async (req, res) => {
         if (exists.rows.length > 0) return res.status(409).json({ error: 'Email já cadastrado' });
         const senha_hash = await bcrypt.hash(senha, 10);
         const result = await pool.query(
-            'INSERT INTO users (nome, email, senha_hash) VALUES ($1, $2, $3) RETURNING id, nome, email, role',
+            'INSERT INTO users (nome, email, senha_hash) VALUES ($1, $2, $3) RETURNING id, nome, email, role, permissions',
             [nome, email, senha_hash]
         );
         const user = result.rows[0];
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role, nome: user.nome }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role, nome: user.nome, permissions: user.permissions || [] }, JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({ token, user });
     } catch (err) {
         console.error(err);
@@ -212,8 +242,8 @@ app.post('/api/auth/login', async (req, res) => {
         const user = result.rows[0];
         const valid = await bcrypt.compare(senha, user.senha_hash);
         if (!valid) return res.status(401).json({ error: 'Credenciais inválidas' });
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role, nome: user.nome }, JWT_SECRET, { expiresIn: '7d' });
-        res.json({ token, user: { id: user.id, nome: user.nome, email: user.email, role: user.role } });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role, nome: user.nome, permissions: user.permissions || [] }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { id: user.id, nome: user.nome, email: user.email, role: user.role, permissions: user.permissions || [] } });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Erro interno' });
@@ -222,7 +252,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/auth/me', authMiddleware, async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, nome, email, role, avatar_url, created_at FROM users WHERE id = $1', [req.user.id]);
+        const result = await pool.query('SELECT id, nome, email, role, permissions, avatar_url, ativo, created_at FROM users WHERE id = $1', [req.user.id]);
         if (result.rows.length === 0) return res.status(404).json({ error: 'Usuário não encontrado' });
         res.json(result.rows[0]);
     } catch (err) {
@@ -259,7 +289,7 @@ app.get('/api/courses/:id', async (req, res) => {
 });
 
 // Admin: CRUD Courses
-app.post('/api/admin/courses', authMiddleware, adminMiddleware, async (req, res) => {
+app.post('/api/admin/courses', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         const { titulo, descricao, descricao_curta, nivel, duracao, categoria, preco, destaque } = req.body;
         const result = await pool.query(
@@ -272,7 +302,7 @@ app.post('/api/admin/courses', authMiddleware, adminMiddleware, async (req, res)
     }
 });
 
-app.put('/api/admin/courses/:id', authMiddleware, adminMiddleware, async (req, res) => {
+app.put('/api/admin/courses/:id', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         const { titulo, descricao, descricao_curta, nivel, duracao, categoria, preco, destaque, ativo } = req.body;
         const result = await pool.query(
@@ -285,7 +315,7 @@ app.put('/api/admin/courses/:id', authMiddleware, adminMiddleware, async (req, r
     }
 });
 
-app.delete('/api/admin/courses/:id', authMiddleware, adminMiddleware, async (req, res) => {
+app.delete('/api/admin/courses/:id', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         await pool.query('DELETE FROM courses WHERE id = $1', [req.params.id]);
         res.json({ message: 'Curso removido' });
@@ -297,7 +327,7 @@ app.delete('/api/admin/courses/:id', authMiddleware, adminMiddleware, async (req
 // ============================================
 // MODULES (Admin)
 // ============================================
-app.post('/api/admin/modules', authMiddleware, adminMiddleware, async (req, res) => {
+app.post('/api/admin/modules', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         const { course_id, titulo, descricao, ordem } = req.body;
         const result = await pool.query(
@@ -310,7 +340,7 @@ app.post('/api/admin/modules', authMiddleware, adminMiddleware, async (req, res)
     }
 });
 
-app.put('/api/admin/modules/:id', authMiddleware, adminMiddleware, async (req, res) => {
+app.put('/api/admin/modules/:id', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         const { titulo, descricao, ordem, ativo } = req.body;
         const result = await pool.query(
@@ -323,7 +353,7 @@ app.put('/api/admin/modules/:id', authMiddleware, adminMiddleware, async (req, r
     }
 });
 
-app.delete('/api/admin/modules/:id', authMiddleware, adminMiddleware, async (req, res) => {
+app.delete('/api/admin/modules/:id', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         await pool.query('DELETE FROM modules WHERE id = $1', [req.params.id]);
         res.json({ message: 'Módulo removido' });
@@ -335,7 +365,7 @@ app.delete('/api/admin/modules/:id', authMiddleware, adminMiddleware, async (req
 // ============================================
 // LESSONS (Admin + Members)
 // ============================================
-app.post('/api/admin/lessons', authMiddleware, adminMiddleware, async (req, res) => {
+app.post('/api/admin/lessons', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         const { module_id, titulo, descricao, video_url, duracao, ordem, gratuita } = req.body;
         const result = await pool.query(
@@ -348,7 +378,7 @@ app.post('/api/admin/lessons', authMiddleware, adminMiddleware, async (req, res)
     }
 });
 
-app.put('/api/admin/lessons/:id', authMiddleware, adminMiddleware, async (req, res) => {
+app.put('/api/admin/lessons/:id', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         const { titulo, descricao, video_url, duracao, ordem, gratuita, ativo } = req.body;
         const result = await pool.query(
@@ -361,7 +391,7 @@ app.put('/api/admin/lessons/:id', authMiddleware, adminMiddleware, async (req, r
     }
 });
 
-app.delete('/api/admin/lessons/:id', authMiddleware, adminMiddleware, async (req, res) => {
+app.delete('/api/admin/lessons/:id', authMiddleware, adminMiddleware, requirePermission('manage_courses'), async (req, res) => {
     try {
         await pool.query('DELETE FROM lessons WHERE id = $1', [req.params.id]);
         res.json({ message: 'Aula removida' });
@@ -461,12 +491,99 @@ app.get('/api/courses/:id/progress', authMiddleware, async (req, res) => {
 // ============================================
 // ADMIN: Users management
 // ============================================
-app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) => {
+app.get('/api/admin/users', authMiddleware, adminMiddleware, requirePermission('manage_users'), async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, nome, email, role, ativo, created_at FROM users ORDER BY created_at DESC');
+        const result = await pool.query('SELECT id, nome, email, role, permissions, ativo, created_at FROM users ORDER BY created_at DESC');
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+app.post('/api/admin/users', authMiddleware, adminMiddleware, requirePermission('manage_users'), async (req, res) => {
+    try {
+        const { nome, email, senha, role = 'aluno', permissions = [] } = req.body;
+        if (!nome || !email || !senha) return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios' });
+        if (!['aluno', 'admin'].includes(role)) return res.status(400).json({ error: 'Tipo de perfil inválido' });
+        if (senha.length < 8) return res.status(400).json({ error: 'A senha deve ter pelo menos 8 caracteres' });
+        const allowed = ['manage_courses', 'manage_users'];
+        const requestedPermissions = Array.isArray(permissions) ? permissions : [];
+        const safePermissions = role === 'admin' ? requestedPermissions.filter(item => allowed.includes(item)) : [];
+        const senhaHash = await bcrypt.hash(senha, 10);
+        const result = await pool.query(
+            `INSERT INTO users (nome, email, senha_hash, role, permissions)
+             VALUES ($1, LOWER($2), $3, $4, $5::jsonb)
+             RETURNING id, nome, email, role, permissions, ativo, created_at`,
+            [nome.trim(), email.trim(), senhaHash, role, JSON.stringify(safePermissions)]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        if (err.code === '23505') return res.status(409).json({ error: 'E-mail já cadastrado' });
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao criar usuário' });
+    }
+});
+
+app.put('/api/admin/users/:id', authMiddleware, adminMiddleware, requirePermission('manage_users'), async (req, res) => {
+    try {
+        const { nome, email, role, permissions = [] } = req.body;
+        if (!nome || !email || !['aluno', 'admin'].includes(role)) return res.status(400).json({ error: 'Dados de perfil inválidos' });
+        const allowed = ['manage_courses', 'manage_users'];
+        const requestedPermissions = Array.isArray(permissions) ? permissions : [];
+        const safePermissions = role === 'admin' ? requestedPermissions.filter(item => allowed.includes(item)) : [];
+        if (req.params.id === req.user.id && role !== 'admin') return res.status(400).json({ error: 'Você não pode remover seu próprio acesso administrativo' });
+        if (req.params.id === req.user.id && !safePermissions.includes('manage_users')) return res.status(400).json({ error: 'Você não pode remover sua própria permissão de gerenciar usuários' });
+        const result = await pool.query(
+            `UPDATE users SET nome=$1, email=LOWER($2), role=$3, permissions=$4::jsonb
+             WHERE id=$5 RETURNING id, nome, email, role, permissions, ativo, created_at`,
+            [nome.trim(), email.trim(), role, JSON.stringify(safePermissions), req.params.id]
+        );
+        if (!result.rows.length) return res.status(404).json({ error: 'Usuário não encontrado' });
+        res.json(result.rows[0]);
+    } catch (err) {
+        if (err.code === '23505') return res.status(409).json({ error: 'E-mail já cadastrado' });
+        res.status(500).json({ error: 'Erro ao atualizar usuário' });
+    }
+});
+
+app.patch('/api/admin/users/:id/status', authMiddleware, adminMiddleware, requirePermission('manage_users'), async (req, res) => {
+    try {
+        const ativo = req.body.ativo === true;
+        if (req.params.id === req.user.id && !ativo) return res.status(400).json({ error: 'Você não pode pausar o próprio perfil' });
+        const result = await pool.query('UPDATE users SET ativo=$1 WHERE id=$2 RETURNING id, ativo', [ativo, req.params.id]);
+        if (!result.rows.length) return res.status(404).json({ error: 'Usuário não encontrado' });
+        res.json(result.rows[0]);
+    } catch {
+        res.status(500).json({ error: 'Erro ao alterar status' });
+    }
+});
+
+app.post('/api/admin/users/:id/reset-password', authMiddleware, adminMiddleware, requirePermission('manage_users'), async (req, res) => {
+    try {
+        const { senha } = req.body;
+        if (!senha || senha.length < 8) return res.status(400).json({ error: 'A nova senha deve ter pelo menos 8 caracteres' });
+        const senhaHash = await bcrypt.hash(senha, 10);
+        const result = await pool.query('UPDATE users SET senha_hash=$1 WHERE id=$2 RETURNING id', [senhaHash, req.params.id]);
+        if (!result.rows.length) return res.status(404).json({ error: 'Usuário não encontrado' });
+        res.json({ message: 'Senha redefinida com sucesso' });
+    } catch {
+        res.status(500).json({ error: 'Erro ao redefinir senha' });
+    }
+});
+
+app.delete('/api/admin/users/:id', authMiddleware, adminMiddleware, requirePermission('manage_users'), async (req, res) => {
+    try {
+        if (req.params.id === req.user.id) return res.status(400).json({ error: 'Você não pode excluir o próprio perfil' });
+        const target = await pool.query('SELECT role FROM users WHERE id=$1', [req.params.id]);
+        if (!target.rows.length) return res.status(404).json({ error: 'Usuário não encontrado' });
+        if (target.rows[0].role === 'admin') {
+            const admins = await pool.query("SELECT COUNT(*) FROM users WHERE role='admin' AND ativo=TRUE");
+            if (Number(admins.rows[0].count) <= 1) return res.status(400).json({ error: 'O último administrador ativo não pode ser excluído' });
+        }
+        await pool.query('DELETE FROM users WHERE id=$1', [req.params.id]);
+        res.json({ message: 'Usuário excluído' });
+    } catch {
+        res.status(500).json({ error: 'Erro ao excluir usuário' });
     }
 });
 

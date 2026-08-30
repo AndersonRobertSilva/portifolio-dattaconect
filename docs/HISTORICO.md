@@ -31,6 +31,8 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 15. Corrigido conflito `EADDRINUSE`: o Easypanel injeta `PORT=80`, mas o processo da API agora recebe explicitamente `PORT=3001` pelo Supervisor.
 16. Corrigido 404 nas URLs amigáveis: o `nginx.conf` agora é instalado diretamente em `conf.d`, sem depender do entrypoint/template que o Easypanel não executou.
 17. Adicionado retorno ao painel administrativo nos menus desktop e mobile da área do aluno, visível exclusivamente para usuários com papel `admin`.
+18. Implementada gestão completa de perfis: criação de alunos/admins, edição, permissões, pausa/reativação, reset de senha e exclusão protegida.
+19. Criadas permissões granulares `manage_courses` e `manage_users`, verificadas no backend e migradas automaticamente para administradores existentes.
 
 ## Decisões conhecidas
 

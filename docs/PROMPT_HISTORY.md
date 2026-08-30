@@ -67,3 +67,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** permitir que o administrador retorne ao dashboard de gestão após acessar a área do aluno.
 
 **Resultado:** incluído link condicional “Painel Admin” nos menus desktop e mobile da área de membros, exibido somente quando `role` é `admin`.
+
+## 2026-08-30 — Gestão de usuários e administradores
+
+**Solicitação:** adicionar ações de reset de senha, exclusão, edição e pausa para cada perfil, além de permissões e criação de novos administradores responsáveis pelos cursos.
+
+**Resultado:** adicionada gestão completa de usuários no painel e na API, com permissões separadas para cursos e usuários, migração automática do banco e proteções contra autoexclusão, autopausa e remoção do último administrador.

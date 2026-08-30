@@ -20,6 +20,11 @@ Prefixo: `/api`. **JWT** exige `Authorization: Bearer <token>`; **admin** exige 
 | `POST/PUT/DELETE /admin/modules[/:id]` | admin | Gerenciar módulos |
 | `POST/PUT/DELETE /admin/lessons[/:id]` | admin | Gerenciar aulas |
 | `GET /admin/users` | admin | Listar usuários |
+| `POST /admin/users` | `manage_users` | Criar aluno ou administrador |
+| `PUT /admin/users/:id` | `manage_users` | Editar perfil, papel e permissões |
+| `PATCH /admin/users/:id/status` | `manage_users` | Pausar ou reativar perfil |
+| `POST /admin/users/:id/reset-password` | `manage_users` | Redefinir senha |
+| `DELETE /admin/users/:id` | `manage_users` | Excluir perfil |
 | `GET /admin/stats` | admin | Indicadores administrativos |
 | `GET /health` | Público | Verificar disponibilidade |
 
@@ -31,7 +36,7 @@ users 1---N user_lessons N---1 lessons
 courses 1---N modules 1---N lessons
 ```
 
-- `users`: identidade, hash, papel e status.
+- `users`: identidade, hash, papel, permissões administrativas e status.
 - `courses`: catálogo.
 - `modules`: agrupamento ordenado no curso.
 - `lessons`: conteúdo, vídeo e gratuidade.
@@ -43,6 +48,8 @@ courses 1---N modules 1---N lessons
 - E-mail único; uma matrícula por usuário/curso; um progresso por usuário/aula.
 - Aulas não gratuitas exigem matrícula, exceto para administradores.
 - Percentual recalculado ao concluir uma aula; JWT expira em sete dias.
+- Administradores podem receber `manage_courses`, `manage_users` ou ambas. As permissões são consultadas no banco a cada ação administrativa.
+- O administrador não pode pausar, rebaixar ou excluir o próprio perfil; o último administrador ativo não pode ser excluído.
 
 ## Mudanças de esquema
 
