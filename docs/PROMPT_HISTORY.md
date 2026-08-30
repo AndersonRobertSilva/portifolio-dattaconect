@@ -31,3 +31,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** melhorar a faixa de empresas atendidas para destacar texto e marcas de forma legível.
 
 **Resultado:** faixa recebeu painel com contraste, hierarquia tipográfica mais clara e logotipos em cards claros com comportamento responsivo.
+
+## 2026-08-30 — Fundo das logos
+
+**Solicitação:** adicionar fundo às logos da faixa de prova social.
+
+**Resultado:** aplicado fundo branco sólido e borda clara a cada logo; versão do CSS incrementada para impedir cache da aparência anterior.

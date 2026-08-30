@@ -226,11 +226,11 @@ header.member-header {
     padding: 17px;
     margin: auto;
     object-fit: contain;
-    border: 1px solid rgba(255,255,255,.78);
+    border: 1px solid #e4e9f1;
     border-radius: 12px;
-    background: rgba(255,255,255,.94);
+    background-color: #ffffff;
     filter: grayscale(1) contrast(1.08);
-    opacity: .88;
+    opacity: 1;
     transition: transform .2s ease, filter .2s ease, opacity .2s ease, box-shadow .2s ease;
 }
 .trust-logos img:hover {
