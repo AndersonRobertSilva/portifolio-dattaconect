@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demonstração da Área de Membros | Datta Conect</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=1.1"><link rel="stylesheet" href="modern.css?v=2.2">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+<body>
+    <header id="header" class="member-header"><div class="container nav-wrapper">
+        <a href="/" class="logo">Datta<span>Conect</span></a>
+        <nav class="desktop-nav" aria-label="Navegação da demonstração"><ul><li><button type="button" class="demo-nav-link active" data-view="dashboard">Visão geral</button></li><li><button type="button" class="demo-nav-link" data-view="player">Player do curso</button></li></ul></nav>
+        <a href="/login" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Voltar ao login</a>
+    </div></header>
+
+    <main class="demo-member-main">
+        <section class="member-dashboard" id="demo-dashboard"><div class="container">
+            <div class="demo-notice"><span><i class="fas fa-flask"></i> Ambiente demonstrativo — nenhum dado desta página é real.</span><a href="/login">Acessar conta real</a></div>
+            <div class="dashboard-header"><div><p class="section-kicker">Datta Academy</p><h1>Olá, <span class="gradient-text">Visitante</span>!</h1><p>Explore a estrutura da experiência de aprendizagem.</p></div><button type="button" class="btn btn-primary" data-open-player><i class="fas fa-play"></i> Abrir curso demonstrativo</button></div>
+            <div class="demo-summary-grid"><article><i class="fas fa-book-open"></i><div><strong>1</strong><span>curso em andamento</span></div></article><article><i class="fas fa-circle-check"></i><div><strong>42%</strong><span>progresso geral</span></div></article><article><i class="fas fa-clock"></i><div><strong>3h20</strong><span>tempo de estudo</span></div></article></div>
+            <div class="demo-section-heading"><div><p class="section-kicker">Continue aprendendo</p><h2>Meu curso</h2></div></div>
+            <div class="my-courses-grid"><article class="my-course-card glass-card" data-open-player tabindex="0"><div class="my-course-thumb"><i class="fas fa-chart-bar"></i></div><div class="my-course-info"><span class="course-category">Business Intelligence</span><h3>Power BI para Decisões Estratégicas</h3><div class="progress-bar-wrapper"><div class="progress-bar"><div class="progress-fill demo-progress-42"></div></div><span>42%</span></div></div><div class="my-course-action"><i class="fas fa-play"></i></div></article></div>
+            <div class="demo-section-heading"><div><p class="section-kicker">Próximos passos</p><h2>Cursos disponíveis</h2></div></div>
+            <div class="courses-grid">
+                <article class="course-card glass-card"><div class="course-thumb"><div class="course-thumb-placeholder"><i class="fas fa-database"></i></div><span class="course-badge-level">Intermediário</span></div><div class="course-info"><span class="course-category">Dados &amp; Analytics</span><h3>SQL para Análise de Dados</h3><p>Consulte, organize e analise bases com segurança.</p><div class="course-meta"><span><i class="fas fa-clock"></i> 10 horas</span></div><div class="course-footer"><span class="course-price">Gratuito</span><button type="button" class="btn btn-primary btn-sm" data-open-player>Ver estrutura</button></div></div></article>
+                <article class="course-card glass-card"><div class="course-thumb"><div class="course-thumb-placeholder"><i class="fab fa-python"></i></div><span class="course-badge-level">Avançado</span></div><div class="course-info"><span class="course-category">Automação</span><h3>Rotinas Inteligentes com Python</h3><p>Automatize tarefas e construa fluxos eficientes.</p><div class="course-meta"><span><i class="fas fa-clock"></i> 16 horas</span></div><div class="course-footer"><span class="course-price">Gratuito</span><button type="button" class="btn btn-primary btn-sm" data-open-player>Ver estrutura</button></div></div></article>
+            </div>
+        </div></section>
+
+        <section class="course-player" id="demo-player" hidden><div class="container">
+            <button type="button" class="btn btn-outline btn-sm demo-back"><i class="fas fa-arrow-left"></i> Voltar aos cursos</button>
+            <div class="player-layout"><div class="player-main"><div class="video-container"><div class="demo-video-preview"><span class="eyebrow">Aula demonstrativa</span><i class="fas fa-circle-play"></i><p>Preview da experiência de vídeo</p></div></div><div class="lesson-info"><span class="course-category">Módulo 1 · Fundamentos</span><h2>Pensando em indicadores</h2><p>Aprenda a transformar objetivos de negócio em métricas úteis, claras e acionáveis.</p><button type="button" class="btn btn-primary btn-sm"><i class="fas fa-check"></i> Marcar como concluída</button></div></div>
+                <aside class="player-sidebar"><div class="player-sidebar-header"><h3>Power BI para Decisões</h3><div class="progress-bar-wrapper"><div class="progress-bar"><div class="progress-fill demo-progress-42"></div></div><span>42%</span></div></div><div class="modules-list">
+                    <div class="module-item"><div class="module-header"><i class="fas fa-folder-open"></i> Fundamentos</div><div class="lessons-list"><div class="lesson-item completed"><div class="lesson-status"><i class="fas fa-check-circle"></i></div><div class="lesson-text"><span class="lesson-name">Bem-vindo à jornada</span><span class="lesson-duration">08 min</span></div></div><div class="lesson-item active"><div class="lesson-status"><i class="far fa-circle"></i></div><div class="lesson-text"><span class="lesson-name">Pensando em indicadores</span><span class="lesson-duration">18 min</span></div></div></div></div>
+                    <div class="module-item"><div class="module-header"><i class="fas fa-folder"></i> Construção do dashboard</div><div class="lessons-list"><div class="lesson-item"><div class="lesson-status"><i class="far fa-circle"></i></div><div class="lesson-text"><span class="lesson-name">Organização da base</span><span class="lesson-duration">24 min</span></div></div><div class="lesson-item"><div class="lesson-status"><i class="far fa-circle"></i></div><div class="lesson-text"><span class="lesson-name">Página executiva</span><span class="lesson-duration">32 min</span></div></div></div></div>
+                </div></aside>
+            </div>
+        </div></section>
+    </main>
+    <script src="script.js?v=2.0"></script><script>
+        const dashboard=document.getElementById('demo-dashboard'),player=document.getElementById('demo-player'),navButtons=document.querySelectorAll('[data-view]');
+        function setView(view){const open=view==='player';dashboard.hidden=open;player.hidden=!open;navButtons.forEach(button=>button.classList.toggle('active',button.dataset.view===view));window.scrollTo({top:0,behavior:'smooth'});}
+        document.querySelectorAll('[data-open-player]').forEach(element=>element.addEventListener('click',()=>setView('player')));document.querySelector('.demo-back').addEventListener('click',()=>setView('dashboard'));navButtons.forEach(button=>button.addEventListener('click',()=>setView(button.dataset.view)));
+    </script>
+</body>
+</html>

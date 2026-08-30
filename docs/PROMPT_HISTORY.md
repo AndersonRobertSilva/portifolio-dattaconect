@@ -37,3 +37,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** adicionar fundo às logos da faixa de prova social.
 
 **Resultado:** aplicado fundo branco sólido e borda clara a cada logo; versão do CSS incrementada para impedir cache da aparência anterior.
+
+## 2026-08-30 — Ambiente demonstrativo de treinamentos
+
+**Solicitação:** liberar acesso para verificar a estrutura da área de membros enquanto a plataforma real está indisponível.
+
+**Resultado:** criada rota pública `/demo-membros` com dashboard, catálogo e player preenchidos por dados fictícios; adicionado acesso pela tela de login sem contornar a autenticação real.

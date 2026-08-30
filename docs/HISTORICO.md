@@ -25,6 +25,7 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 9. Melhoradas acessibilidade do menu móvel e mensagem de indisponibilidade da API em login/cadastro.
 10. Reforçada a legibilidade da faixa de prova social com painel contrastante, texto mais amplo e logotipos em cards claros e responsivos.
 11. Fixado fundo branco sólido nos cards de logos e incrementada a versão do CSS para `2.1`, evitando que o navegador reutilize a aparência anterior em cache.
+12. Criado `/demo-membros`, ambiente público com dados fictícios para revisar dashboard e player sem depender da API ou liberar autenticação real.
 
 ## Decisões conhecidas
 

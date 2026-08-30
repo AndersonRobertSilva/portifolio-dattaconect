@@ -33,6 +33,7 @@ Início (/)
 | `/treinamentos` | `treinamentos.html` | Sim | Catálogo consumido da API |
 | `/cadastro` | `cadastro.html` | Sim | Criação de conta |
 | `/login` | `login.html` | Sim | Autenticação |
+| `/demo-membros` | `demo-membros.html` | Sim | Demonstração estática e segura da área de membros |
 | `/membros` | `membros.html` | JWT | Cursos, matrícula, aulas e progresso |
 | `/admin` | `admin.html` | JWT + admin | Gestão da plataforma |
 | `/privacidade` | `privacidade.html` | Sim | Política de privacidade |
