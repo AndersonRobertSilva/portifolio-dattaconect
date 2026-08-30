@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=1.1">
-    <link rel="stylesheet" href="modern.css?v=2.3">
+    <link rel="stylesheet" href="modern.css?v=2.4">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
@@ -72,6 +72,27 @@
             <div class="admin-tabs reveal-up">
                 <button class="admin-tab active" id="courses-tab-button" onclick="showTab('courses')"><i class="fas fa-book"></i> Cursos</button>
                 <button class="admin-tab" id="users-tab-button" onclick="showTab('users')"><i class="fas fa-users"></i> Usuários</button>
+                <button class="admin-tab" id="enrollments-tab-button" onclick="showTab('enrollments')"><i class="fas fa-clipboard-check"></i> Matrículas</button>
+            </div>
+
+            <!-- ENROLLMENTS TAB -->
+            <div class="admin-content" id="tab-enrollments" style="display:none;">
+                <div class="admin-toolbar">
+                    <div><h2>Matrículas e desempenho</h2><p class="admin-toolbar-copy">Acompanhe o avanço de cada aluno e gerencie o vínculo com os cursos.</p></div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="showEnrollmentModal()"><i class="fas fa-user-plus"></i> Nova matrícula</button>
+                </div>
+                <div class="enrollment-filters">
+                    <label><span>Buscar aluno</span><input type="search" id="enrollment-search" placeholder="Nome ou e-mail"></label>
+                    <label><span>Curso</span><select id="enrollment-course-filter"><option value="">Todos os cursos</option></select></label>
+                    <label><span>Andamento</span><select id="enrollment-status-filter"><option value="">Todos</option><option value="not-started">Não iniciado</option><option value="in-progress">Em andamento</option><option value="completed">Concluído</option></select></label>
+                </div>
+                <div class="enrollment-summary" id="enrollment-summary"></div>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table" id="enrollments-table">
+                        <thead><tr><th>Aluno</th><th>Curso</th><th>Progresso</th><th>Aulas</th><th>Início</th><th>Última atividade</th><th>Status</th><th>Ações</th></tr></thead>
+                        <tbody id="enrollments-tbody"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- COURSES TAB -->
@@ -158,9 +179,23 @@
                     <legend>Permissões administrativas</legend>
                     <label class="permission-option"><input type="checkbox" id="uf-manage-courses" value="manage_courses"><span><strong>Gerenciar cursos</strong><small>Criar e editar cursos, módulos e aulas.</small></span></label>
                     <label class="permission-option"><input type="checkbox" id="uf-manage-users" value="manage_users"><span><strong>Gerenciar usuários</strong><small>Criar administradores, editar, pausar, redefinir senha e excluir perfis.</small></span></label>
+                    <label class="permission-option"><input type="checkbox" id="uf-manage-enrollments" value="manage_enrollments"><span><strong>Gerenciar matrículas</strong><small>Matricular alunos, acompanhar desempenho, reiniciar progresso e remover vínculos.</small></span></label>
                 </fieldset>
                 <div class="form-feedback" id="user-form-error" hidden></div>
                 <button type="submit" class="btn btn-primary btn-full">Salvar usuário</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Enrollment -->
+    <div class="modal-overlay" id="enrollment-modal" style="display:none;">
+        <div class="modal glass-card">
+            <div class="modal-header"><h3>Nova matrícula</h3><button type="button" onclick="closeModal('enrollment-modal')" aria-label="Fechar">&times;</button></div>
+            <form id="enrollment-form" class="auth-form">
+                <div class="form-group"><label for="ef-user">Aluno</label><select id="ef-user" required></select></div>
+                <div class="form-group"><label for="ef-course">Curso</label><select id="ef-course" required></select></div>
+                <div class="form-feedback" id="enrollment-form-error" hidden></div>
+                <button type="submit" class="btn btn-primary btn-full">Confirmar matrícula</button>
             </form>
         </div>
     </div>
@@ -209,6 +244,7 @@
 
         let currentCourseId = null;
         let managedUsers = [];
+        let managedEnrollments = [];
         let currentAdminPermissions = user.permissions || [];
 
         function authHeaders() { return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }; }
@@ -219,9 +255,11 @@
             document.querySelector(`[onclick="showTab('${tab}')"]`).classList.add('active');
             document.getElementById('tab-courses').style.display = tab === 'courses' ? '' : 'none';
             document.getElementById('tab-users').style.display = tab === 'users' ? '' : 'none';
+            document.getElementById('tab-enrollments').style.display = tab === 'enrollments' ? '' : 'none';
             document.getElementById('course-detail').style.display = 'none';
             if (tab === 'users') loadUsers();
             if (tab === 'courses') loadCourses();
+            if (tab === 'enrollments') loadEnrollments();
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -465,7 +503,7 @@
 
         function renderPermissions(account) {
             if (account.role !== 'admin') return '<span class="permission-muted">Acesso de aluno</span>';
-            const labels = { manage_courses: 'Cursos', manage_users: 'Usuários' };
+            const labels = { manage_courses: 'Cursos', manage_users: 'Usuários', manage_enrollments: 'Matrículas' };
             const permissions = account.permissions || [];
             return permissions.length
                 ? `<div class="permission-badges">${permissions.map(item => `<span>${labels[item] || escapeHtml(item)}</span>`).join('')}</div>`
@@ -484,6 +522,7 @@
             document.getElementById('uf-password-group').hidden = Boolean(account);
             document.getElementById('uf-manage-courses').checked = account?.permissions?.includes('manage_courses') || false;
             document.getElementById('uf-manage-users').checked = account?.permissions?.includes('manage_users') || false;
+            document.getElementById('uf-manage-enrollments').checked = account?.permissions?.includes('manage_enrollments') || false;
             document.getElementById('user-form-error').hidden = true;
             updatePermissionVisibility();
             document.getElementById('user-modal').style.display = 'flex';
@@ -498,7 +537,7 @@
         document.getElementById('user-form').addEventListener('submit', async event => {
             event.preventDefault();
             const id = document.getElementById('uf-id').value;
-            const permissions = ['manage_courses', 'manage_users'].filter(permission => document.getElementById('uf-' + permission.replace('_', '-')).checked);
+            const permissions = ['manage_courses', 'manage_users', 'manage_enrollments'].filter(permission => document.getElementById('uf-' + permission.replace('_', '-')).checked);
             const body = {
                 nome: document.getElementById('uf-nome').value,
                 email: document.getElementById('uf-email').value,
@@ -552,6 +591,120 @@
             return data;
         }
 
+        // ============ ENROLLMENTS & PERFORMANCE ============
+        async function loadEnrollments() {
+            const tbody = document.getElementById('enrollments-tbody');
+            tbody.innerHTML = '<tr><td colspan="8" class="table-message"><i class="fas fa-spinner fa-spin"></i> Carregando matrículas...</td></tr>';
+            try {
+                managedEnrollments = await adminRequest('/api/admin/enrollments');
+                populateEnrollmentCourseFilter();
+                renderEnrollments();
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="8" class="table-message">${escapeHtml(error.message)}</td></tr>`;
+            }
+        }
+
+        function populateEnrollmentCourseFilter() {
+            const select = document.getElementById('enrollment-course-filter');
+            const selected = select.value;
+            const courses = [...new Map(managedEnrollments.map(item => [item.course_id, item.course_titulo])).entries()];
+            select.innerHTML = '<option value="">Todos os cursos</option>' + courses.map(([id, title]) => `<option value="${id}">${escapeHtml(title)}</option>`).join('');
+            select.value = selected;
+        }
+
+        function enrollmentStage(progress) {
+            const value = Number(progress || 0);
+            if (value >= 100) return 'completed';
+            if (value > 0) return 'in-progress';
+            return 'not-started';
+        }
+
+        function renderEnrollments() {
+            const search = document.getElementById('enrollment-search').value.trim().toLowerCase();
+            const courseId = document.getElementById('enrollment-course-filter').value;
+            const status = document.getElementById('enrollment-status-filter').value;
+            const filtered = managedEnrollments.filter(item => {
+                const matchesSearch = !search || item.user_nome.toLowerCase().includes(search) || item.user_email.toLowerCase().includes(search);
+                return matchesSearch && (!courseId || item.course_id === courseId) && (!status || enrollmentStage(item.progresso) === status);
+            });
+
+            const average = filtered.length ? Math.round(filtered.reduce((sum, item) => sum + Number(item.progresso || 0), 0) / filtered.length) : 0;
+            const completed = filtered.filter(item => Number(item.progresso) >= 100).length;
+            const active = filtered.filter(item => Number(item.progresso) > 0 && Number(item.progresso) < 100).length;
+            document.getElementById('enrollment-summary').innerHTML = `
+                <span><strong>${filtered.length}</strong> matrículas</span>
+                <span><strong>${average}%</strong> progresso médio</span>
+                <span><strong>${active}</strong> em andamento</span>
+                <span><strong>${completed}</strong> concluídas</span>`;
+
+            document.getElementById('enrollments-tbody').innerHTML = filtered.length ? filtered.map(item => {
+                const progress = Math.min(100, Math.max(0, Number(item.progresso || 0)));
+                const stage = enrollmentStage(progress);
+                const stageLabel = { 'not-started': 'Não iniciado', 'in-progress': 'Em andamento', completed: 'Concluído' }[stage];
+                return `<tr>
+                    <td><strong>${escapeHtml(item.user_nome)}</strong><small class="table-subtext">${escapeHtml(item.user_email)}</small></td>
+                    <td>${escapeHtml(item.course_titulo)}</td>
+                    <td><div class="table-progress"><div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div><span>${progress.toFixed(0)}%</span></div></td>
+                    <td>${Number(item.aulas_concluidas)}/${Number(item.total_aulas)}</td>
+                    <td>${formatDate(item.data_inicio)}</td>
+                    <td>${item.ultima_atividade ? formatDate(item.ultima_atividade, true) : '<span class="permission-muted">Sem atividade</span>'}</td>
+                    <td><span class="table-badge enrollment-${stage}">${stageLabel}</span></td>
+                    <td><div class="table-actions">
+                        <button type="button" class="btn-icon" title="Reiniciar progresso" aria-label="Reiniciar progresso" onclick="resetEnrollmentProgress('${item.id}')"><i class="fas fa-rotate-left"></i></button>
+                        <button type="button" class="btn-icon btn-danger" title="Remover matrícula" aria-label="Remover matrícula" onclick="deleteEnrollment('${item.id}')"><i class="fas fa-user-minus"></i></button>
+                    </div></td>
+                </tr>`;
+            }).join('') : '<tr><td colspan="8" class="table-message">Nenhuma matrícula encontrada com estes filtros.</td></tr>';
+        }
+
+        function formatDate(value, includeTime = false) {
+            if (!value) return '—';
+            return new Date(value).toLocaleString('pt-BR', includeTime ? { dateStyle: 'short', timeStyle: 'short' } : { dateStyle: 'short' });
+        }
+
+        ['enrollment-search', 'enrollment-course-filter', 'enrollment-status-filter'].forEach(id => {
+            document.getElementById(id).addEventListener(id === 'enrollment-search' ? 'input' : 'change', renderEnrollments);
+        });
+
+        async function showEnrollmentModal() {
+            const feedback = document.getElementById('enrollment-form-error');
+            feedback.hidden = true;
+            try {
+                const options = await adminRequest('/api/admin/enrollments/options');
+                document.getElementById('ef-user').innerHTML = '<option value="">Selecione um aluno</option>' + options.users.map(item => `<option value="${item.id}">${escapeHtml(item.nome)} — ${escapeHtml(item.email)}</option>`).join('');
+                document.getElementById('ef-course').innerHTML = '<option value="">Selecione um curso</option>' + options.courses.map(item => `<option value="${item.id}">${escapeHtml(item.titulo)}</option>`).join('');
+                document.getElementById('enrollment-modal').style.display = 'flex';
+            } catch (error) { alert(error.message); }
+        }
+
+        document.getElementById('enrollment-form').addEventListener('submit', async event => {
+            event.preventDefault();
+            const feedback = document.getElementById('enrollment-form-error');
+            try {
+                await adminRequest('/api/admin/enrollments', { method: 'POST', body: JSON.stringify({ user_id: document.getElementById('ef-user').value, course_id: document.getElementById('ef-course').value }) });
+                closeModal('enrollment-modal');
+                loadEnrollments();
+                loadStats();
+            } catch (error) { feedback.textContent = error.message; feedback.hidden = false; }
+        });
+
+        async function resetEnrollmentProgress(id) {
+            if (!confirm('Reiniciar todo o progresso desta matrícula? As aulas concluídas serão desmarcadas.')) return;
+            try {
+                await adminRequest('/api/admin/enrollments/' + id + '/reset-progress', { method: 'POST' });
+                loadEnrollments();
+            } catch (error) { alert(error.message); }
+        }
+
+        async function deleteEnrollment(id) {
+            if (!confirm('Remover esta matrícula? O progresso do aluno neste curso também será apagado.')) return;
+            try {
+                await adminRequest('/api/admin/enrollments/' + id, { method: 'DELETE' });
+                loadEnrollments();
+                loadStats();
+            } catch (error) { alert(error.message); }
+        }
+
         // Init
         async function initializeAdmin() {
             try {
@@ -559,10 +712,13 @@
                 currentAdminPermissions = me.permissions || [];
                 const canCourses = currentAdminPermissions.includes('manage_courses');
                 const canUsers = currentAdminPermissions.includes('manage_users');
+                const canEnrollments = currentAdminPermissions.includes('manage_enrollments');
                 document.getElementById('courses-tab-button').hidden = !canCourses;
                 document.getElementById('users-tab-button').hidden = !canUsers;
-                if (!canCourses && canUsers) showTab('users');
-                else if (canCourses) loadCourses();
+                document.getElementById('enrollments-tab-button').hidden = !canEnrollments;
+                if (canCourses) loadCourses();
+                else if (canUsers) showTab('users');
+                else if (canEnrollments) showTab('enrollments');
                 else document.querySelector('.admin-tabs').innerHTML = '<p class="table-message">Este administrador ainda não possui permissões atribuídas.</p>';
                 loadStats();
             } catch (error) {

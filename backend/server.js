@@ -76,7 +76,7 @@ async function migrateUserPermissions() {
     `);
     if (!column.rows[0].exists) {
         await pool.query(`ALTER TABLE users ADD COLUMN permissions JSONB NOT NULL DEFAULT '[]'::jsonb`);
-        await pool.query(`UPDATE users SET permissions = '["manage_courses","manage_users"]'::jsonb WHERE role = 'admin'`);
+        await pool.query(`UPDATE users SET permissions = '["manage_courses","manage_users","manage_enrollments"]'::jsonb WHERE role = 'admin'`);
         console.log('✅ Permissões administrativas migradas');
     }
 }
@@ -100,7 +100,7 @@ async function ensureProductionAdmin() {
             permissions = EXCLUDED.permissions,
             ativo = TRUE,
             updated_at = CURRENT_TIMESTAMP
-    `, ['Administrador', ADMIN_EMAIL, adminHash, JSON.stringify(['manage_courses', 'manage_users'])]);
+    `, ['Administrador', ADMIN_EMAIL, adminHash, JSON.stringify(['manage_courses', 'manage_users', 'manage_enrollments'])]);
     console.log('✅ Conta administrativa sincronizada');
 }
 
@@ -152,7 +152,7 @@ async function runInlineInit() {
     `);
     // Admin seed
     const adminHash = await bcrypt.hash('admin123', 10);
-    await pool.query(`INSERT INTO users (nome, email, senha_hash, role, permissions) VALUES ($1, $2, $3, 'admin', $4::jsonb) ON CONFLICT (email) DO NOTHING`, ['Administrador', 'admin@dattaconect.com.br', adminHash, JSON.stringify(['manage_courses', 'manage_users'])]);
+    await pool.query(`INSERT INTO users (nome, email, senha_hash, role, permissions) VALUES ($1, $2, $3, 'admin', $4::jsonb) ON CONFLICT (email) DO NOTHING`, ['Administrador', 'admin@dattaconect.com.br', adminHash, JSON.stringify(['manage_courses', 'manage_users', 'manage_enrollments'])]);
     // Courses seed
     await pool.query(`INSERT INTO courses (id, titulo, descricao, descricao_curta, nivel, duracao, categoria, destaque, ordem) VALUES
         ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Power BI do Zero ao Avançado', 'Aprenda a criar dashboards profissionais com Power BI.', 'Domine o Power BI com projetos práticos.', 'Iniciante', '40 horas', 'Business Intelligence', TRUE, 1),
@@ -464,7 +464,9 @@ app.post('/api/lessons/:id/complete', authMiddleware, async (req, res) => {
             const total = await pool.query('SELECT COUNT(*) FROM lessons l JOIN modules m ON m.id = l.module_id WHERE m.course_id = $1 AND l.ativo = TRUE', [courseId]);
             const done = await pool.query('SELECT COUNT(*) FROM user_lessons ul JOIN lessons l ON l.id = ul.lesson_id JOIN modules m ON m.id = l.module_id WHERE m.course_id = $1 AND ul.user_id = $2 AND ul.concluido = TRUE', [courseId, req.user.id]);
             const progress = (parseInt(done.rows[0].count) / parseInt(total.rows[0].count) * 100).toFixed(2);
-            await pool.query('UPDATE user_courses SET progresso = $1 WHERE user_id = $2 AND course_id = $3', [progress, req.user.id, courseId]);
+            await pool.query(`UPDATE user_courses
+                SET progresso=$1, data_conclusao=CASE WHEN $1::numeric >= 100 THEN CURRENT_TIMESTAMP ELSE NULL END
+                WHERE user_id=$2 AND course_id=$3`, [progress, req.user.id, courseId]);
         }
         res.json({ message: 'Aula concluída' });
     } catch (err) {
@@ -508,7 +510,7 @@ app.post('/api/admin/users', authMiddleware, adminMiddleware, requirePermission(
         if (!nome || !email || !senha) return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios' });
         if (!['aluno', 'admin'].includes(role)) return res.status(400).json({ error: 'Tipo de perfil inválido' });
         if (senha.length < 8) return res.status(400).json({ error: 'A senha deve ter pelo menos 8 caracteres' });
-        const allowed = ['manage_courses', 'manage_users'];
+        const allowed = ['manage_courses', 'manage_users', 'manage_enrollments'];
         const requestedPermissions = Array.isArray(permissions) ? permissions : [];
         const safePermissions = role === 'admin' ? requestedPermissions.filter(item => allowed.includes(item)) : [];
         const senhaHash = await bcrypt.hash(senha, 10);
@@ -530,7 +532,7 @@ app.put('/api/admin/users/:id', authMiddleware, adminMiddleware, requirePermissi
     try {
         const { nome, email, role, permissions = [] } = req.body;
         if (!nome || !email || !['aluno', 'admin'].includes(role)) return res.status(400).json({ error: 'Dados de perfil inválidos' });
-        const allowed = ['manage_courses', 'manage_users'];
+        const allowed = ['manage_courses', 'manage_users', 'manage_enrollments'];
         const requestedPermissions = Array.isArray(permissions) ? permissions : [];
         const safePermissions = role === 'admin' ? requestedPermissions.filter(item => allowed.includes(item)) : [];
         if (req.params.id === req.user.id && role !== 'admin') return res.status(400).json({ error: 'Você não pode remover seu próprio acesso administrativo' });
@@ -586,6 +588,117 @@ app.delete('/api/admin/users/:id', authMiddleware, adminMiddleware, requirePermi
         res.json({ message: 'Usuário excluído' });
     } catch {
         res.status(500).json({ error: 'Erro ao excluir usuário' });
+    }
+});
+
+// ============================================
+// ADMIN: Enrollments and course performance
+// ============================================
+app.get('/api/admin/enrollments', authMiddleware, adminMiddleware, requirePermission('manage_enrollments'), async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                uc.id, uc.user_id, uc.course_id, uc.progresso, uc.data_inicio, uc.data_conclusao,
+                u.nome AS user_nome, u.email AS user_email, u.ativo AS user_ativo,
+                c.titulo AS course_titulo, c.categoria AS course_categoria, c.ativo AS course_ativo,
+                COUNT(DISTINCT l.id) FILTER (WHERE l.ativo = TRUE) AS total_aulas,
+                COUNT(DISTINCT ul.lesson_id) FILTER (WHERE ul.concluido = TRUE) AS aulas_concluidas,
+                MAX(ul.data_conclusao) AS ultima_atividade
+            FROM user_courses uc
+            JOIN users u ON u.id = uc.user_id
+            JOIN courses c ON c.id = uc.course_id
+            LEFT JOIN modules m ON m.course_id = c.id AND m.ativo = TRUE
+            LEFT JOIN lessons l ON l.module_id = m.id AND l.ativo = TRUE
+            LEFT JOIN user_lessons ul ON ul.user_id = u.id AND ul.lesson_id = l.id
+            GROUP BY uc.id, u.id, c.id
+            ORDER BY COALESCE(MAX(ul.data_conclusao), uc.data_inicio) DESC
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao carregar matrículas' });
+    }
+});
+
+app.get('/api/admin/enrollments/options', authMiddleware, adminMiddleware, requirePermission('manage_enrollments'), async (req, res) => {
+    try {
+        const [users, courses] = await Promise.all([
+            pool.query("SELECT id, nome, email FROM users WHERE role='aluno' AND ativo=TRUE ORDER BY nome"),
+            pool.query('SELECT id, titulo FROM courses WHERE ativo=TRUE ORDER BY ordem, titulo')
+        ]);
+        res.json({ users: users.rows, courses: courses.rows });
+    } catch {
+        res.status(500).json({ error: 'Erro ao carregar opções de matrícula' });
+    }
+});
+
+app.post('/api/admin/enrollments', authMiddleware, adminMiddleware, requirePermission('manage_enrollments'), async (req, res) => {
+    try {
+        const { user_id, course_id } = req.body;
+        if (!user_id || !course_id) return res.status(400).json({ error: 'Aluno e curso são obrigatórios' });
+        const result = await pool.query(
+            `INSERT INTO user_courses (user_id, course_id)
+             SELECT u.id, c.id FROM users u CROSS JOIN courses c
+             WHERE u.id=$1 AND u.role='aluno' AND u.ativo=TRUE AND c.id=$2 AND c.ativo=TRUE
+             ON CONFLICT (user_id, course_id) DO NOTHING RETURNING *`,
+            [user_id, course_id]
+        );
+        if (!result.rows.length) {
+            const existing = await pool.query('SELECT 1 FROM user_courses WHERE user_id=$1 AND course_id=$2', [user_id, course_id]);
+            return res.status(existing.rows.length ? 409 : 400).json({ error: existing.rows.length ? 'Este aluno já está matriculado no curso' : 'Selecione um aluno e um curso ativos' });
+        }
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        if (err.code === '23503') return res.status(400).json({ error: 'Aluno ou curso inválido' });
+        res.status(500).json({ error: 'Erro ao criar matrícula' });
+    }
+});
+
+app.post('/api/admin/enrollments/:id/reset-progress', authMiddleware, adminMiddleware, requirePermission('manage_enrollments'), async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const enrollment = await client.query('SELECT user_id, course_id FROM user_courses WHERE id=$1 FOR UPDATE', [req.params.id]);
+        if (!enrollment.rows.length) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'Matrícula não encontrada' });
+        }
+        const { user_id, course_id } = enrollment.rows[0];
+        await client.query(`DELETE FROM user_lessons WHERE user_id=$1 AND lesson_id IN (
+            SELECT l.id FROM lessons l JOIN modules m ON m.id=l.module_id WHERE m.course_id=$2
+        )`, [user_id, course_id]);
+        await client.query('UPDATE user_courses SET progresso=0, data_inicio=CURRENT_TIMESTAMP, data_conclusao=NULL WHERE id=$1', [req.params.id]);
+        await client.query('COMMIT');
+        res.json({ message: 'Progresso reiniciado' });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: 'Erro ao reiniciar progresso' });
+    } finally {
+        client.release();
+    }
+});
+
+app.delete('/api/admin/enrollments/:id', authMiddleware, adminMiddleware, requirePermission('manage_enrollments'), async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const enrollment = await client.query('SELECT user_id, course_id FROM user_courses WHERE id=$1 FOR UPDATE', [req.params.id]);
+        if (!enrollment.rows.length) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'Matrícula não encontrada' });
+        }
+        const { user_id, course_id } = enrollment.rows[0];
+        await client.query(`DELETE FROM user_lessons WHERE user_id=$1 AND lesson_id IN (
+            SELECT l.id FROM lessons l JOIN modules m ON m.id=l.module_id WHERE m.course_id=$2
+        )`, [user_id, course_id]);
+        await client.query('DELETE FROM user_courses WHERE id=$1', [req.params.id]);
+        await client.query('COMMIT');
+        res.json({ message: 'Matrícula removida' });
+    } catch {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: 'Erro ao remover matrícula' });
+    } finally {
+        client.release();
     }
 });
 

@@ -35,6 +35,9 @@ Este é o ponto de retomada oficial do projeto. Atualize este arquivo ao encerra
 19. Criadas permissões granulares `manage_courses` e `manage_users`, verificadas no backend e migradas automaticamente para administradores existentes.
 20. Reforçada a política de cadastro público: novos usuários são gravados explicitamente como `aluno`, com permissões vazias; promoção exige um administrador com `manage_users`.
 21. Corrigida reprodução em segundo plano: vídeos, áudios e iframes são interrompidos ao sair do player, trocar de curso ou navegar para Catálogo/Site.
+22. Criado painel de matrículas e desempenho, com filtros por aluno, curso e andamento, progresso médio, aulas concluídas e última atividade.
+23. Adicionadas matrícula manual, reinício de progresso e remoção de matrícula, protegidos pela permissão independente `manage_enrollments`.
+24. Validações da entrega de matrículas: sintaxe do backend e do JavaScript administrativo, configuração Docker Compose e integridade do diff aprovadas.
 
 ## Decisões conhecidas
 

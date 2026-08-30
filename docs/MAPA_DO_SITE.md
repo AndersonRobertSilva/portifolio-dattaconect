@@ -18,7 +18,8 @@ Início (/)
 │   ├── Indicadores
 │   ├── Cursos
 │   ├── Módulos e aulas
-│   └── Usuários
+│   ├── Usuários
+│   └── Matrículas e desempenho por aluno/curso
 └── Política de privacidade (/privacidade)
 ```
 
@@ -43,7 +44,7 @@ Início (/)
 1. **Cliente institucional:** Início → solução/projeto → WhatsApp.
 2. **Novo aluno:** Treinamentos → Cadastro → Área do aluno → Matrícula → Aula.
 3. **Aluno recorrente:** Login → Área do aluno → Curso → Concluir aula.
-4. **Administrador:** Login → Administração → gerenciar conteúdo ou consultar usuários.
+4. **Administrador:** Login → Administração → gerenciar conteúdo, usuários, matrículas e desempenho.
 
 ## Observações
 

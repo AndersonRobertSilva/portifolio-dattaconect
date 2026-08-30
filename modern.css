@@ -355,6 +355,19 @@ header.member-header {
 .permission-option small { margin-top: .2rem; color: var(--text-secondary); line-height: 1.4; }
 .form-feedback { margin-bottom: 1rem; padding: .75rem; border: 1px solid rgba(239,68,68,.35); border-radius: 9px; background: rgba(239,68,68,.1); color: #fca5a5; font-size: .86rem; }
 .table-message { padding: 2rem !important; color: var(--text-secondary) !important; text-align: center !important; }
+.enrollment-filters { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.enrollment-filters label > span { display: block; margin-bottom: .4rem; color: var(--text-secondary); font-size: .76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.enrollment-filters input, .enrollment-filters select { width: 100%; padding: .75rem .85rem; border: 1px solid var(--glass-border); border-radius: 9px; background: rgba(255,255,255,.045); color: #fff; }
+.enrollment-summary { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 1.25rem; }
+.enrollment-summary span { padding: .55rem .75rem; border: 1px solid var(--glass-border); border-radius: 9px; background: rgba(255,255,255,.025); color: var(--text-secondary); font-size: .78rem; }
+.enrollment-summary strong { margin-right: .25rem; color: #fff; font-size: .92rem; }
+.table-subtext { display: block; margin-top: .25rem; color: var(--text-secondary); font-size: .72rem; font-weight: 400; }
+.table-progress { display: flex; align-items: center; gap: .6rem; min-width: 145px; }
+.table-progress .progress-bar { min-width: 88px; }
+.table-progress span { color: #dbe3ef; font-size: .76rem; font-weight: 700; }
+.enrollment-not-started { color: #94a3b8; }
+.enrollment-in-progress { color: #fbbf24; }
+.enrollment-completed { color: #34d399; }
 .auth-form input, .admin-form input, .admin-form textarea, .admin-form select { border-radius: 10px; background: rgba(255,255,255,.055); border-color: var(--glass-border); color: #fff; }
 .auth-form input:focus, .admin-form input:focus, .admin-form textarea:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(109,124,255,.12); }
 
@@ -393,6 +406,7 @@ footer { background: #050d18; border-top: 1px solid var(--glass-border); }
     .cta-card { text-align: center; }
     .demo-notice { align-items: flex-start; flex-direction: column; }
     .demo-summary-grid { grid-template-columns: 1fr; }
+    .enrollment-filters { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

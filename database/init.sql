@@ -81,7 +81,7 @@ CREATE INDEX IF NOT EXISTS idx_user_lessons_user ON user_lessons(user_id);
 
 -- Admin padrão (senha: admin123)
 INSERT INTO users (nome, email, senha_hash, role, permissions) VALUES
-('Administrador', 'admin@dattaconect.com.br', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', '["manage_courses","manage_users"]'::jsonb)
+('Administrador', 'admin@dattaconect.com.br', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', '["manage_courses","manage_users","manage_enrollments"]'::jsonb)
 ON CONFLICT (email) DO NOTHING;
 
 -- Cursos de exemplo

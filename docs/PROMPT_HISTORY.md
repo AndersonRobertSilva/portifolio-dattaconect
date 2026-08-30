@@ -85,3 +85,9 @@ Registro cronológico dos pedidos que orientam o projeto. Este documento preserv
 **Solicitação:** impedir que o vídeo continue executando quando o aluno sair do ambiente de estudo ou acessar o catálogo.
 
 **Resultado:** mídias HTML e iframes passaram a ser pausados e descarregados ao voltar ao dashboard, trocar de curso, clicar em links de navegação ou sair da página.
+
+## 2026-08-30 — Gestão de matrículas e desempenho
+
+**Solicitação:** criar no painel administrativo um ambiente para gerenciar matrículas e acompanhar a performance de cada aluno nos cursos em andamento.
+
+**Resultado:** adicionada uma aba protegida por permissão própria, com busca e filtros, indicadores de avanço, aulas concluídas, datas de atividade, matrícula manual, reinício de progresso e remoção do vínculo.

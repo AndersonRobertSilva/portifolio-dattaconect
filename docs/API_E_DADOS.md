@@ -25,6 +25,11 @@ Prefixo: `/api`. **JWT** exige `Authorization: Bearer <token>`; **admin** exige 
 | `PATCH /admin/users/:id/status` | `manage_users` | Pausar ou reativar perfil |
 | `POST /admin/users/:id/reset-password` | `manage_users` | Redefinir senha |
 | `DELETE /admin/users/:id` | `manage_users` | Excluir perfil |
+| `GET /admin/enrollments` | `manage_enrollments` | Listar matrículas e desempenho por aluno/curso |
+| `GET /admin/enrollments/options` | `manage_enrollments` | Listar alunos e cursos ativos para matrícula manual |
+| `POST /admin/enrollments` | `manage_enrollments` | Matricular manualmente um aluno ativo |
+| `POST /admin/enrollments/:id/reset-progress` | `manage_enrollments` | Reiniciar conclusões e progresso do curso |
+| `DELETE /admin/enrollments/:id` | `manage_enrollments` | Remover matrícula e seu progresso associado |
 | `GET /admin/stats` | admin | Indicadores administrativos |
 | `GET /health` | Público | Verificar disponibilidade |
 
@@ -50,7 +55,9 @@ courses 1---N modules 1---N lessons
 - A promoção para administrador só pode ocorrer pelo painel/API protegida com `manage_users`.
 - Aulas não gratuitas exigem matrícula, exceto para administradores.
 - Percentual recalculado ao concluir uma aula; JWT expira em sete dias.
-- Administradores podem receber `manage_courses`, `manage_users` ou ambas. As permissões são consultadas no banco a cada ação administrativa.
+- Administradores podem receber `manage_courses`, `manage_users` e `manage_enrollments` de forma independente. As permissões são consultadas no banco a cada ação administrativa.
+- A gestão de matrículas exibe percentual, aulas concluídas, datas de início e última atividade; somente alunos e cursos ativos podem ser vinculados manualmente.
+- Reiniciar ou remover uma matrícula apaga as conclusões das aulas daquele curso para manter os indicadores consistentes.
 - O administrador não pode pausar, rebaixar ou excluir o próprio perfil; o último administrador ativo não pode ser excluído.
 
 ## Mudanças de esquema
